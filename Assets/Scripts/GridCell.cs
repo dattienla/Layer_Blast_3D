@@ -6,22 +6,31 @@ public class GridCell : MonoBehaviour
 {
     public int x, y;
     public Stack<GameObject> layers = new Stack<GameObject>();
-
-    //public void Init(int x, int y)
-    //{
-    //    this.x = x;
-    //    this.y = y;
-    //}
-
+    private Renderer rend;
+    private Color defaultColor;
+    public Color validColor = Color.green;
+    public Color invalidColor = Color.red;
     public bool IsEmpty() => layers.Count == 0;
 
-    public void AddLayer(GameObject obj)
+    void Awake()
     {
-        layers.Push(obj);
+        rend = GetComponent<Renderer>();
+        defaultColor = rend.material.color;
+    }
+    public void SetHighlight(bool highlight, bool isValid = true)
+    {
+        if (!highlight)
+        {
+            rend.material.color = defaultColor;
+        }
+        else
+        {
+            rend.material.color = isValid ? validColor : invalidColor;
+        }
+    }
+    public GameObject PeekTopLayer()
+    {
+        return layers.Count > 0 ? layers.Peek() : null;
     }
 
-    public GameObject RemoveTopLayer()
-    {
-        return layers.Count > 0 ? layers.Pop() : null;
-    }
 }

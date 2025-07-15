@@ -120,3 +120,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   x: 0
   y: 0
+  validColor: {r: 0, g: 0.5254902, b: 0, a: 1}
+  invalidColor: {r: 0.5377358, g: 0.33311227, b: 0, a: 1}
