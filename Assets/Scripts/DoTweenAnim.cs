@@ -3,35 +3,39 @@ using DG.Tweening;
 
 public class DoTweenAnim : MonoBehaviour
 {
-    public Vector3 targetPosition;   // vị trí đích    // thời gian bay lên
-    public float startYOffset = -15f; // điểm xuất phát bên dưới màn hình
+    private Vector3[] targetPosition;   // vị trí đích  
+    public int index; // chỉ số của block trong hàng đợi
+
+    private Vector3 startPosition = new Vector3(0f, 0f, -15f); // vị trí bắt đầu
 
     void Start()
     {
-        AnimateIn();
+        transform.position = startPosition;
+        targetPosition = new Vector3[10];
+        targetPosition[1] = new Vector3(-2.5f, 0, -4); // vị trí slot 1
+        targetPosition[2] = new Vector3(0, 0, -4);  // vị trí slot 2
+        targetPosition[3] = new Vector3(2f, 0, -4);  // vị trí slot 3
     }
 
-    public void AnimateIn()
+    public void BlockStart()
     {
-        // Bắt đầu từ bên dưới màn hình
-        transform.position = new Vector3(targetPosition.x, targetPosition.y, startYOffset);
-        transform.localScale = Vector3.one; // hoặc lớn hơn nếu bạn muốn phóng to rồi thu nhỏ
-
         // Dùng DOTween để di chuyển và thu nhỏ 
-        transform.DOScale(0.5f, 0.1f).OnComplete(() =>
+        transform.DOScale(new Vector3(0.5f, 0.2f, 0.5f), 0.1f).OnComplete(() =>
         {
-            transform.DOMove(targetPosition, 0.5f).SetEase(Ease.OutBack);
+            transform.DOMove(targetPosition[index], 0.5f).SetEase(Ease.OutBack);
         });
     }
 
     public void ZoomIn()
     {
-        transform.DOScale(1f, 0.2f).SetEase(Ease.OutBack);
+        transform.DOScale(new Vector3(1f, 0.2f, 1f), 0.2f).SetEase(Ease.OutBack);
+        Vector3 pos = transform.position;
+        pos.y = 0.2f;
+        transform.position = pos;
     }
     public void ZoomOut()
     {
-        transform.DOScale(0.5f, 0.2f).SetEase(Ease.InBack);
-        transform.DOMove(targetPosition, 0.3f).SetEase(Ease.InBack);
+        transform.DOScale(new Vector3(0.5f, 0.2f, 0.5f), 0.2f).SetEase(Ease.InBack);
+        transform.DOMove(targetPosition[index], 0.3f).SetEase(Ease.InBack);
     }
-
 }

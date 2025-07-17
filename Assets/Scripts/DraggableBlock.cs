@@ -8,7 +8,7 @@ public class DraggableBlock : MonoBehaviour
     private Vector3 offset;
     private Camera cam;
     private bool isDragging = false;
-    private Vector3 posDefault;
+    // private Vector3 posDefault;
     private List<GridCell> previewCells = new List<GridCell>();
     private DoTweenAnim doTweenAnim;
 
@@ -16,44 +16,98 @@ public class DraggableBlock : MonoBehaviour
     {
         doTweenAnim = GetComponent<DoTweenAnim>();
         cam = Camera.main;
-        posDefault = doTweenAnim.targetPosition; // Lưu vị trí mặc định của block
+        //posDefault = doTweenAnim.targetPosition[doTweenAnim.index]; // Lưu vị trí mặc định của block
     }
 
-    void OnMouseDown()
+    void Update()
     {
-        doTweenAnim.ZoomIn(); // Phóng to block về trạng thái ban đầu
-        offset = transform.position - GetMouseWorldPosition();
-        isDragging = true;
+        // PC: xử lý bằng chuột trái
+        if (Input.GetMouseButtonDown(0))
+        {
+            TryStartDrag(Input.mousePosition);
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            if (isDragging)
+            {
+                DragBlock(Input.mousePosition);
+            }
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            if (isDragging)
+            {
+                EndDrag();
+            }
+        }
+
+        // Mobile: xử lý bằng touch
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            switch (touch.phase)
+            {
+                case TouchPhase.Began:
+                    TryStartDrag(touch.position);
+                    break;
+                case TouchPhase.Moved:
+                case TouchPhase.Stationary:
+                    if (isDragging)
+                    {
+                        DragBlock(touch.position);
+                    }
+                    break;
+                case TouchPhase.Ended:
+                case TouchPhase.Canceled:
+                    if (isDragging)
+                    {
+                        EndDrag();
+                    }
+                    break;
+            }
+        }
     }
 
-    void OnMouseDrag()
+    void TryStartDrag(Vector3 inputPos)
     {
-        if (!isDragging) return;
-        Vector3 mousePos = GetMouseWorldPosition();
-        transform.position = mousePos + offset;
+        Ray ray = cam.ScreenPointToRay(inputPos);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            if (hit.transform == transform) // chỉ bắt khi chạm đúng object này
+            {
+                doTweenAnim.ZoomIn();
+                offset = transform.position - GetWorldPosition(inputPos);
+                isDragging = true;
+            }
+        }
+    }
+
+    void DragBlock(Vector3 inputPos)
+    {
+        Vector3 worldPos = GetWorldPosition(inputPos);
+        transform.position = worldPos + offset;
         PreviewSnapCells();
     }
 
-    void OnMouseUp()
+    void EndDrag()
     {
         isDragging = false;
-        foreach (var cell in previewCells)
+        if (previewCells != null)
         {
-            cell.SetHighlight(false);
+            foreach (var cell in previewCells)
+            {
+                cell.GetComponent<GridCell>().SetHighlight(false);
+            }
         }
         SnapToGrid();
     }
 
-    Vector3 GetMouseWorldPosition()
+    Vector3 GetWorldPosition(Vector3 screenPos)
     {
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = cam.nearClipPlane;
-        Vector3 worldPos = cam.ScreenToWorldPoint(mousePos);
-        worldPos.y = 0f; // ép xuống mặt đất (trục y = 0)
+        screenPos.z = cam.WorldToScreenPoint(transform.position).z;
+        Vector3 worldPos = cam.ScreenToWorldPoint(screenPos);
+        worldPos.y = 0f;
         return worldPos;
-        //Vector3 mouseScreenPos = Input.mousePosition;
-        //mouseScreenPos.z = cam.transform.position.y; // distance từ camera đến block
-        //return cam.ScreenToWorldPoint(mouseScreenPos);
     }
     /// <summary>
     /// snap block vào grid
@@ -70,7 +124,6 @@ public class DraggableBlock : MonoBehaviour
 
             if (cell == null || !cell.IsEmpty())
             {
-                Debug.Log("Không thể đặt block vì có ô bị chiếm hoặc nằm ngoài lưới.");
                 doTweenAnim.ZoomOut(); // Trả về vị trí mặc định nếu không hợp lệ
             }
             else
@@ -89,14 +142,17 @@ public class DraggableBlock : MonoBehaviour
                 cube.position = cell.transform.position;
                 cell.layers.Push(cube.gameObject); // Tăng số lượng layer trong cell
             }
-            //Sau khi snap, kiểm tra xem có block nào trùng màu không thì xoá đi
             BlockManager placedBlock = GetComponent<BlockManager>();
+            placedBlock.isUsed = true; // Đánh dấu block đã được sử dụng
+            QueueBlockManager.Instance.DeleteBlockFromQueue();
+            //Sau khi snap, kiểm tra xem có block nào trùng màu không thì xoá đi
             if (placedBlock != null)
             {
                 FindObjectOfType<DeleteBlock>().ExplodeBlockAndNeighBors(placedBlock);
             }
             // Sau khi đặt xong, huỷ chức năng kéo thả
             Destroy(this);
+            QueueBlockManager.Instance.CheckEndGame(); // Kiểm tra kết thúc game sau khi snap
         }
     }
     /// <summary>
@@ -137,3 +193,36 @@ public class DraggableBlock : MonoBehaviour
 
 
 }
+/*
+     void OnMouseDown()
+    {
+        doTweenAnim.ZoomIn(); // Phóng to block về trạng thái ban đầu
+        offset = transform.position - GetMouseWorldPosition();
+        isDragging = true;
+    }
+
+    void OnMouseDrag()
+    {
+        if (!isDragging) return;
+        Vector3 mousePos = GetMouseWorldPosition();
+        transform.position = mousePos + offset;
+        PreviewSnapCells();
+    }
+
+    void OnMouseUp()
+    {
+        isDragging = false;
+        foreach (var cell in previewCells)
+        {
+            cell.SetHighlight(false);
+        }
+        SnapToGrid();
+    }
+
+    Vector3 GetMouseWorldPosition()
+    {
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = cam.nearClipPlane;
+        Vector3 worldPos = cam.ScreenToWorldPoint(mousePos);
+        worldPos.y = 0f; // ép xuống mặt đất (trục y = 0)
+        return worldPos;*/

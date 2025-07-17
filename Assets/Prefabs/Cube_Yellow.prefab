@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7132830526296339808}
   - component: {fileID: 2382621460342467714}
   - component: {fileID: 3759060217935048970}
+  - component: {fileID: 150801470248650312}
   m_Layer: 0
   m_Name: Cube_Yellow
   m_TagString: Untagged
@@ -105,3 +106,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &150801470248650312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5647247483749564043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6981dc1745bfe1343bcb3f4f0e9e33e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cubeQuantity: 0
+  color: yellow
+  isUsed: 0

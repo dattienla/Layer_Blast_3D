@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8125280090621837642}
   - component: {fileID: 8819472171725789526}
   - component: {fileID: 636499455253448544}
+  - component: {fileID: 3168701928748910677}
   m_Layer: 0
   m_Name: Cube_Red
   m_TagString: Untagged
@@ -105,3 +106,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3168701928748910677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6474235130967976410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6981dc1745bfe1343bcb3f4f0e9e33e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cubeQuantity: 0
+  color: red
+  isUsed: 0

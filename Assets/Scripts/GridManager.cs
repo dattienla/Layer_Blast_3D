@@ -15,9 +15,6 @@ public class GridManager : MonoBehaviour
         height = 6;
         Instance = this;
         grid = new GridCell[10, 10];
-    }
-    private void Start()
-    {
         GridCell[] allTiles = FindObjectsOfType<GridCell>();
         foreach (var cell in allTiles)
         {
@@ -26,6 +23,19 @@ public class GridManager : MonoBehaviour
                 grid[cell.x, cell.y] = cell;
             }
         }
+    }
+
+    // lấy ra cell tại toạ độ nào đó trong grid
+    public GridCell GetCellInPos(Vector2Int pos)
+    {
+        GridCell cellInPos = null;
+
+        foreach (var cell in grid)
+        {
+            if (cell == null) continue;
+            if (pos.x == cell.x | pos.y == cell.y) cellInPos = cell;
+        }
+        return cellInPos;
     }
     /// <summary>
     /// Trả về ô gần nhất với 1 vị trí trong thế giới (dùng để snap)
@@ -48,6 +58,8 @@ public class GridManager : MonoBehaviour
         }
         return closest;
     }
+
+    // lấy ra tất cả ô hàng xóm của 1 ô cụ thể
     public List<GridCell> GetNeighbors(GridCell cell)
     {
         List<GridCell> neighbors = new List<GridCell>();
@@ -78,6 +90,8 @@ public class GridManager : MonoBehaviour
 
         return neighbors;
     }
+
+    // check giới hạn biên của lưới
     private bool IsInsideGrid(int x, int y)
     {
         return x > 0 && x <= width && y > 0 && y <= height;

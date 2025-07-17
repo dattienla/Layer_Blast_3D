@@ -7,12 +7,10 @@ using UnityEngine;
 public class BlockManager : MonoBehaviour
 {
     public int cubeQuantity; // Số lượng cube con trong block
-    public Color color; // Màu của block
+    public string color; // Màu của block
+    public bool isUsed = false; // Trạng thái của block
 
-    private void Start()
-    {
-        color = GetColor(); // Lấy màu từ cube con đầu tiên
-    }
+
 
     // Trả về tất cả cube con
     public List<Transform> GetCubes()
@@ -58,31 +56,24 @@ public class BlockManager : MonoBehaviour
         }
         return new List<GridCell>(neighborsOfBlock);
     }
-    // Lấy ra màu của block (lấy từ cube con)
-    public Color GetColor()
-    {
-        if (GetCubes().Count > 0)
-        {
-            Renderer renderer = GetCubes()[0].GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                return renderer.material.color;
-            }
-        }
-        return Color.white; // Mặc định nếu không tìm thấy
-    }
     // Phá hủy block
     public void Explode()
     {
+        //Debug.Log("sda");
         foreach (var cube in GetCubes())
         {
+            Debug.Log("sda");
+            Debug.Log("diem " + GameManager.Instance.score);
             cube.DOScale(Vector3.one * 0.3f, 0.4f).SetEase(Ease.InBack).OnComplete(() =>
             {
-                cube.DOMove(new Vector3(-0.15f, 0f, 7f), 0.7f)
-                    .SetEase(Ease.InBack).OnComplete(() =>
+                cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 0.1f, cube.transform.position.z), 0.1f).OnComplete(() =>
                 {
-                    GameManager.Instance.score++; // Tăng điểm khi phá hủy block
-                    Destroy(cube.gameObject);
+                    cube.DOMove(new Vector3(-0.15f, 0f, 7f), 0.7f)
+                    .SetEase(Ease.InBack).OnComplete(() =>
+                    {
+                        GameManager.Instance.score++; // Tăng điểm khi phá hủy block
+                        Destroy(cube.gameObject);
+                    });
                 });
             });
         }
@@ -90,9 +81,25 @@ public class BlockManager : MonoBehaviour
         {
             if (cell.layers.Count > 0)
             {
-               // GameManager.Instance.score++; // Tăng điểm khi phá hủy block
+                // GameManager.Instance.score++; // Tăng điểm khi phá hủy block
                 cell.layers.Clear(); // Giảm số lượng layer trong ô
             }
         }
     }
+
+    // Lấy ra toạ độ tương đối của các cube con 
+    public List<Vector2Int> GetPositionOfCubes()
+    {
+        List<Vector2Int> offsets = new List<Vector2Int>();
+        foreach (Transform cube in GetCubes())
+        {
+            Vector2Int offset = new Vector2Int(
+                Mathf.Abs(Mathf.RoundToInt(cube.localPosition.z)),
+                Mathf.Abs(Mathf.RoundToInt(cube.localPosition.x))
+            );
+            offsets.Add(offset);
+        }
+        return offsets;
+    }
+
 }

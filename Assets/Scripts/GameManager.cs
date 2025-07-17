@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
@@ -12,37 +13,44 @@ public class GameManager : MonoBehaviour
     private GameObject winGamePanel;
     [SerializeField]
     private GameObject inGamePanel;
+    [SerializeField]
+    private GameObject loseGamePanel;
+
     public int score;
     private int scoreWin;
     private void Awake()
     {
+        score = 0;
+        scoreWin = 50;
         Instance = this;
     }
     // Start is called before the first frame update
     void Start()
     {
-        score = 0;
-        scoreWin = 50;
+        InGamePanel();
     }
 
     // Update is called once per frame
     void Update()
     {
-        InGamePanel();
+        scoreText.text = score.ToString() + "/" + scoreWin.ToString();
         CheckWinGame();
     }
 
     void InGamePanel()
     {
-        scoreText.text = score.ToString() + "/" + scoreWin.ToString();
+        Time.timeScale = 1f;
         inGamePanel.SetActive(true);
         winGamePanel.SetActive(false);
+        loseGamePanel.SetActive(false);
     }
 
     void WinGamePanel()
     {
+        Time.timeScale = 0f;
         inGamePanel.SetActive(false);
         winGamePanel.SetActive(true);
+        loseGamePanel.SetActive(false);
     }
     void CheckWinGame()
     {
@@ -51,9 +59,15 @@ public class GameManager : MonoBehaviour
             WinGamePanel();
         }
     }
-    void EndGamePanel()
+    public void LoseGamePanel()
     {
-
+        Time.timeScale = 0f;
+        inGamePanel.SetActive(false);
+        winGamePanel.SetActive(false);
+        loseGamePanel.SetActive(true);
     }
-
+    public void Reset()
+    {
+        SceneManager.LoadScene(0);
+    }
 }
