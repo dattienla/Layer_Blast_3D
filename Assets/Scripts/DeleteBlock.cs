@@ -6,34 +6,46 @@ public class DeleteBlock : MonoBehaviour
 {
     public void ExplodeBlockAndNeighBors(BlockManager currentBlock)
     {
-        string currentColor = currentBlock.color;
+
+        string currentColor = "";
+        // currentColor = currentBlock.GetColorOutSite();
         List<GridCell> neighbors = currentBlock.GetNeighborOfBlock();
         foreach (GridCell neighbor in neighbors)
         {
-            GameObject neighborTop = neighbor.PeekTopLayer();
-            if (neighborTop == null || neighborTop.transform.parent == null) continue;
-            //GameObject neighborParent = neighborTop.transform.parent.gameObject;
-            //if (neighborParent == null) continue;
+            for (int i = 0; i < 2; i++)
+            {
+                Debug.Log("vòng thứ " + i);
+                currentColor = currentBlock.GetColorOutSite();
+                GameObject neighborTop = neighbor.PeekTopLayer();
+                Debug.Log(neighbor.layers.Count);
+                if (neighborTop == null || neighborTop.transform.parent == null) continue;
+                //GameObject neighborParent = neighborTop.transform.parent.gameObject;
+                //if (neighborParent == null) continue;
 
-            BlockManager neighborBlock = null;
+                BlockManager neighborBlock = null;
 
-            if (neighborTop.transform.parent != null && neighborTop.transform.parent.tag != "level")
-            {
-                Debug.Log("0");
-                neighborBlock = neighborTop.transform.parent.GetComponent<BlockManager>();
-            }
-            else
-            {
-                Debug.Log("1");
-                neighborBlock = neighborTop.GetComponent<BlockManager>();
-            }
-            if (neighborBlock == null) continue;
-            //Debug.Log(" neighbor block: " + neighborBlock.name);
-            // Nếu trùng màu
-            if (neighborBlock.color == currentColor)
-            {
-                currentBlock.Explode();
-                neighborBlock.Explode();
+                if (neighborTop.transform.parent != null && neighborTop.transform.parent.tag != "level")
+                {
+                    neighborBlock = neighborTop.transform.parent.GetComponent<BlockManager>();
+                }
+                else
+                { 
+                    neighborBlock = neighborTop.GetComponent<BlockManager>();
+                }
+
+                if (neighborBlock == null) continue;
+                //Debug.Log(" neighbor block: " + neighborBlock.name);
+                // Nếu trùng màu
+                
+                if (neighborBlock.GetColorOutSite() == currentColor)
+                {
+                    currentBlock.Explode();
+                    neighborBlock.Explode();
+                    Debug.Log(neighbor.layers.Count);
+                    currentBlock.RemoveQuantity();
+                    neighborBlock.RemoveQuantity();
+                }
+                
             }
         }
     }

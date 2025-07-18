@@ -17,7 +17,6 @@ public class LevelManager : MonoBehaviour
     {
         transform.position = new Vector3(-2.5f, 0f, -15f);
         allBlockPref = GameObject.FindGameObjectsWithTag("blockPref");
-        Debug.Log(allBlockPref.Length);
         Level1();
     }
     void Level1()
@@ -47,7 +46,7 @@ public class LevelManager : MonoBehaviour
             {
                 cube.transform.position = cell.transform.position;
             });
-            BlockManager cube_BlockManger = cubeTarget[i].GetComponent<BlockManager>();
+            BlockManager cube_BlockManger = cubeTarget[i].transform.parent.GetComponent<BlockManager>();
             cube_BlockManger.isUsed = true; // Đánh dấu block đã được sử dụng
             // Debug.Log("Cube " + cube.name + " snapped to cell at position: " + cell.transform.position);
         }

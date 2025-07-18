@@ -116,7 +116,7 @@ public class DraggableBlock : MonoBehaviour
     {
         List<GridCell> targetCells = new List<GridCell>();
 
-        // Kiểm tra tất cả cube con xem có đủ ô tróng để snap không
+        // Kiểm tra tất cả cube con xem có đủ ô trống để snap không
         foreach (Transform cube in transform)
         {
             Vector3 worldPos = cube.position;
@@ -127,7 +127,10 @@ public class DraggableBlock : MonoBehaviour
                 doTweenAnim.ZoomOut(); // Trả về vị trí mặc định nếu không hợp lệ
             }
             else
+            {
                 targetCells.Add(cell); // Lưu lại cell hợp lệ
+            }
+
         }
 
         // Snap toàn bộ cùng lúc
@@ -137,7 +140,6 @@ public class DraggableBlock : MonoBehaviour
             {
                 Transform cube = transform.GetChild(i);
                 GridCell cell = targetCells[i];
-
                 // Snap vị trí và add vào cell
                 cube.position = cell.transform.position;
                 cell.layers.Push(cube.gameObject); // Tăng số lượng layer trong cell

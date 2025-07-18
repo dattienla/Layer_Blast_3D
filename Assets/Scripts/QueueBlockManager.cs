@@ -101,7 +101,7 @@ public class QueueBlockManager : MonoBehaviour
                 {
                     bool isValid = true;
                     Vector2Int head = new Vector2Int(x, y);
-                    for (int i = 0; i < blockManager.GetCubes().Count; i++)
+                    for (int i = 0; i < blockManager.GetCubeOutSite().Count; i++)
                     {
                         Vector2Int pos = head + blockManager.GetPositionOfCubes()[i];
                         // Debug.Log("Checking position: " + blockManager.GetPositionOfCubes()[i]);

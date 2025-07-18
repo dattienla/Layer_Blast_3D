@@ -2,32 +2,61 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BlockManager : MonoBehaviour
 {
-    public int cubeQuantity; // Số lượng cube con trong block
-    public string color; // Màu của block
+    //public int cubeQuantity; // Số lượng cube con trong block
+    public string[] color; // Màu của block
     public bool isUsed = false; // Trạng thái của block
+    public int quantity; // Số lượng lớp trong block
 
+    private void Awake()
+    {
 
-
+    }
     // Trả về tất cả cube con
-    public List<Transform> GetCubes()
+    //public List<Transform> GetCubes()
+    //{
+    //    List<Transform> cubes = new List<Transform>();
+    //    foreach (Transform child in transform)
+    //    {
+    //        cubes.Add(child);
+    //    }
+    //    return cubes;
+    //}
+
+    // Lấy ra tất cả các cube con lớp ngoài cùng
+    public List<Transform> GetCubeOutSite()
     {
         List<Transform> cubes = new List<Transform>();
         foreach (Transform child in transform)
         {
-            cubes.Add(child);
+            CubeManager cubeManager = child.GetComponent<CubeManager>();
+            if (cubeManager.status == "cubeOut")
+                cubes.Add(child);
+        }
+        return cubes;
+    }
+    // Lấy ra tất cả các cube con lớp trong
+    public List<Transform> GetCubeInSite()
+    {
+        List<Transform> cubes = new List<Transform>();
+        foreach (Transform child in transform)
+        {
+            CubeManager cubeManager = child.GetComponent<CubeManager>();
+            if (cubeManager.status == "cubeIn")
+                cubes.Add(child);
         }
         return cubes;
     }
 
     // Lấy GridCell mà mỗi cube đang chiếm
-    public List<GridCell> GetOccupiedCells()
+    public HashSet<GridCell> GetOccupiedCells()
     {
-        List<GridCell> cells = new List<GridCell>();
-        foreach (var cube in GetCubes())
+        HashSet<GridCell> cells = new HashSet<GridCell>();
+        foreach (var cube in GetCubeOutSite())
         {
             GridCell cell = GridManager.Instance.GetClosestCell(cube.position);
             if (cell != null)
@@ -37,6 +66,7 @@ public class BlockManager : MonoBehaviour
         }
         return cells;
     }
+
 
     // Lấy ra tất cả hàng xóm của block
     public List<GridCell> GetNeighborOfBlock()
@@ -59,11 +89,48 @@ public class BlockManager : MonoBehaviour
     // Phá hủy block
     public void Explode()
     {
-        //Debug.Log("sda");
-        foreach (var cube in GetCubes())
+        if (quantity == 2)
         {
-            Debug.Log("sda");
-            Debug.Log("diem " + GameManager.Instance.score);
+            foreach (var cube in GetCubeOutSite())
+            {
+                cube.DOScale(Vector3.one * 0.3f, 0.4f).SetEase(Ease.InBack).OnComplete(() =>
+                {
+                    cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 0.1f, cube.transform.position.z), 0.1f).OnComplete(() =>
+                    {
+                        cube.DOMove(new Vector3(-0.15f, 0f, 7f), 0.7f)
+                        .SetEase(Ease.InBack).OnComplete(() =>
+                        {
+                            GameManager.Instance.score++; // Tăng điểm khi phá hủy block
+                            Destroy(cube.gameObject);
+                        });
+                    });
+                });
+            }
+            foreach (var cube in GetCubeInSite())
+            {
+                CubeManager cubeManager = cube.GetComponent<CubeManager>();
+                cubeManager.status = "cubeOut"; // cho cube trong thành cube ngoài 
+                cube.DOScale(new Vector3(1f, 1f, 1f), 0.4f).SetEase(Ease.InBack);
+            }
+            foreach (var cell in GetOccupiedCells())
+            {
+                if (cell.layers.Count > 0)
+                {
+                    cell.layers.Pop(); // Giảm số lượng layer trong ô
+                }
+            }
+        }
+
+        else if (quantity == 1)
+        {
+            Invoke("ExplodeInSite", 0.7f); // Gọi hàm phá hủy trong site sau 0.7 giây
+        }
+    }
+    void ExplodeInSite()
+    {
+        Debug.Log("Edsadsa");
+        foreach (var cube in GetCubeInSite())
+        {
             cube.DOScale(Vector3.one * 0.3f, 0.4f).SetEase(Ease.InBack).OnComplete(() =>
             {
                 cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 0.1f, cube.transform.position.z), 0.1f).OnComplete(() =>
@@ -81,8 +148,7 @@ public class BlockManager : MonoBehaviour
         {
             if (cell.layers.Count > 0)
             {
-                // GameManager.Instance.score++; // Tăng điểm khi phá hủy block
-                cell.layers.Clear(); // Giảm số lượng layer trong ô
+                cell.layers.Pop(); // Giảm số lượng layer trong ô
             }
         }
     }
@@ -91,7 +157,7 @@ public class BlockManager : MonoBehaviour
     public List<Vector2Int> GetPositionOfCubes()
     {
         List<Vector2Int> offsets = new List<Vector2Int>();
-        foreach (Transform cube in GetCubes())
+        foreach (Transform cube in GetCubeOutSite())
         {
             Vector2Int offset = new Vector2Int(
                 Mathf.Abs(Mathf.RoundToInt(cube.localPosition.z)),
@@ -102,4 +168,24 @@ public class BlockManager : MonoBehaviour
         return offsets;
     }
 
+    // Lấy ra màu của block
+    public string GetColorOutSite()
+    {
+        string colorOutSite = "";
+        if (quantity == 2)
+        {
+            colorOutSite = color[0];
+        }
+        else if (quantity == 1)
+        {
+            colorOutSite = color[1];
+        }
+        return colorOutSite;
+    }
+    // Giảm số lượng lớp trong block
+    public void RemoveQuantity()
+    {
+        if (quantity > 0)
+            quantity--;
+    }
 }
