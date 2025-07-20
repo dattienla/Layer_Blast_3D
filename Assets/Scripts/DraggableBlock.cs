@@ -11,7 +11,11 @@ public class DraggableBlock : MonoBehaviour
     // private Vector3 posDefault;
     private List<GridCell> previewCells = new List<GridCell>();
     private DoTweenAnim doTweenAnim;
-
+    public Queue<BlockManager> BlockQ;
+    private void Awake()
+    {
+        BlockQ = new Queue<BlockManager>();
+    }
     void Start()
     {
         doTweenAnim = GetComponent<DoTweenAnim>();
@@ -144,14 +148,56 @@ public class DraggableBlock : MonoBehaviour
                 cube.position = cell.transform.position;
                 cell.layers.Push(cube.gameObject); // Tăng số lượng layer trong cell
             }
+            int cnt = 0;
             BlockManager placedBlock = GetComponent<BlockManager>();
             placedBlock.isUsed = true; // Đánh dấu block đã được sử dụng
             QueueBlockManager.Instance.DeleteBlockFromQueue();
-            //Sau khi snap, kiểm tra xem có block nào trùng màu không thì xoá đi
-            if (placedBlock != null)
+
+            if (!BlockQ.Contains(placedBlock)) BlockQ.Enqueue(placedBlock);
+
+            while (cnt != BlockQ.Count)
             {
-                FindObjectOfType<DeleteBlock>().ExplodeBlockAndNeighBors(placedBlock);
+                cnt = BlockQ.Count;
+                Queue<BlockManager> temp = new Queue<BlockManager>(BlockQ);
+                foreach (var dat in temp)
+                {
+                    HashSet<BlockManager> H = FindObjectOfType<DeleteBlock>().GetBlockNeighbor(dat);
+                    foreach (var h in H)
+                    {
+                        if (!BlockQ.Contains(h)) BlockQ.Enqueue(h);
+                    }
+                }
             }
+            int j = 0;
+            while (j < 2)
+            {
+                Debug.Log(BlockQ.Count);
+                BlockManager blockQ = BlockQ.Peek();
+                if (blockQ != null)
+                {
+                    FindObjectOfType<DeleteBlock>().ExplodeBlockAndNeighBors(blockQ);
+                }
+                if (blockQ.quantity == 0)
+                {
+                    BlockQ.Dequeue();
+                }
+                j++;
+            }
+
+
+            //Sau khi snap, kiểm tra xem có block nào trùng màu không thì xoá đi
+            //if (placedBlock != null)
+            //{
+            //    FindObjectOfType<DeleteBlock>().ExplodeBlockAndNeighBors(placedBlock);
+            //}
+
+
+
+
+
+
+
+
             // Sau khi đặt xong, huỷ chức năng kéo thả
             Destroy(this);
             QueueBlockManager.Instance.CheckEndGame(); // Kiểm tra kết thúc game sau khi snap

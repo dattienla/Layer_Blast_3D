@@ -89,48 +89,8 @@ public class BlockManager : MonoBehaviour
     // Phá hủy block
     public void Explode()
     {
-        if (quantity == 2)
-        {
-            foreach (var cube in GetCubeOutSite())
-            {
-                cube.DOScale(Vector3.one * 0.3f, 0.4f).SetEase(Ease.InBack).OnComplete(() =>
-                {
-                    cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 0.1f, cube.transform.position.z), 0.1f).OnComplete(() =>
-                    {
-                        cube.DOMove(new Vector3(-0.15f, 0f, 7f), 0.7f)
-                        .SetEase(Ease.InBack).OnComplete(() =>
-                        {
-                            GameManager.Instance.score++; // Tăng điểm khi phá hủy block
-                            Destroy(cube.gameObject);
-                        });
-                    });
-                });
-            }
-            foreach (var cube in GetCubeInSite())
-            {
-                CubeManager cubeManager = cube.GetComponent<CubeManager>();
-                cubeManager.status = "cubeOut"; // cho cube trong thành cube ngoài 
-                cube.DOScale(new Vector3(1f, 1f, 1f), 0.4f).SetEase(Ease.InBack);
-            }
-            foreach (var cell in GetOccupiedCells())
-            {
-                if (cell.layers.Count > 0)
-                {
-                    cell.layers.Pop(); // Giảm số lượng layer trong ô
-                }
-            }
-        }
-
-        else if (quantity == 1)
-        {
-            Invoke("ExplodeInSite", 0.7f); // Gọi hàm phá hủy trong site sau 0.7 giây
-        }
-    }
-    void ExplodeInSite()
-    {
-        Debug.Log("Edsadsa");
-        foreach (var cube in GetCubeInSite())
-        {
+        foreach (var cube in GetCubeOutSite())
+        { 
             cube.DOScale(Vector3.one * 0.3f, 0.4f).SetEase(Ease.InBack).OnComplete(() =>
             {
                 cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 0.1f, cube.transform.position.z), 0.1f).OnComplete(() =>
@@ -144,6 +104,16 @@ public class BlockManager : MonoBehaviour
                 });
             });
         }
+        if (quantity == 2)
+        {
+            foreach (var cube in GetCubeInSite())
+            {
+                CubeManager cubeManager = cube.GetComponent<CubeManager>();
+                cubeManager.status = "cubeOut"; // cho cube trong thành cube ngoài 
+                cube.DOScale(new Vector3(1f, 1f, 1f), 0.4f).SetEase(Ease.InBack);
+            }
+            quantity--;
+        }
         foreach (var cell in GetOccupiedCells())
         {
             if (cell.layers.Count > 0)
@@ -152,6 +122,31 @@ public class BlockManager : MonoBehaviour
             }
         }
     }
+    //void ExplodeInSite()
+    //{
+    //    foreach (var cube in GetCubeInSite())
+    //    {
+    //        cube.DOScale(Vector3.one * 0.3f, 0.4f).SetEase(Ease.InBack).OnComplete(() =>
+    //        {
+    //            cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 0.1f, cube.transform.position.z), 0.1f).OnComplete(() =>
+    //            {
+    //                cube.DOMove(new Vector3(-0.15f, 0f, 7f), 0.7f)
+    //                .SetEase(Ease.InBack).OnComplete(() =>
+    //                {
+    //                    GameManager.Instance.score++; // Tăng điểm khi phá hủy block
+    //                    Destroy(cube.gameObject);
+    //                });
+    //            });
+    //        });
+    //    }
+    //    foreach (var cell in GetOccupiedCells())
+    //    {
+    //        if (cell.layers.Count > 0)
+    //        {
+    //            cell.layers.Pop(); // Giảm số lượng layer trong ô
+    //        }
+    //    }
+    //}
 
     // Lấy ra toạ độ tương đối của các cube con 
     public List<Vector2Int> GetPositionOfCubes()
