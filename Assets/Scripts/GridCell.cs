@@ -5,7 +5,7 @@ using UnityEngine;
 public class GridCell : MonoBehaviour
 {
     public int x, y;
-    public Stack<GameObject> layers = new Stack<GameObject>();
+    public Queue<GameObject> layers = new Queue<GameObject>();
     private Renderer rend;
     private Color defaultColor;
     public Color validColor = Color.green;

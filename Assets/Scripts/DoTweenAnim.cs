@@ -7,6 +7,7 @@ public class DoTweenAnim : MonoBehaviour
     public int index; // chỉ số của block trong hàng đợi
 
     private Vector3 startPosition = new Vector3(0f, 0f, -15f); // vị trí bắt đầu
+    
 
     void Start()
     {
@@ -16,7 +17,6 @@ public class DoTweenAnim : MonoBehaviour
         targetPosition[2] = new Vector3(0, 0, -4);  // vị trí slot 2
         targetPosition[3] = new Vector3(2f, 0, -4);  // vị trí slot 3
     }
-
     public void BlockStart()
     {
         // Dùng DOTween để di chuyển và thu nhỏ 
@@ -28,7 +28,9 @@ public class DoTweenAnim : MonoBehaviour
 
     public void ZoomIn()
     {
-        transform.DOScale(new Vector3(1f, 0.2f, 1f), 0.2f).SetEase(Ease.OutBack);
+        transform.DOScale(new Vector3(1f, 0.2f, 1f), 0.2f).SetEase(Ease.OutBack).OnComplete(() =>
+        {
+        });
         Vector3 pos = transform.position;
         pos.y = 0.2f;
         transform.position = pos;
@@ -36,6 +38,10 @@ public class DoTweenAnim : MonoBehaviour
     public void ZoomOut()
     {
         transform.DOScale(new Vector3(0.5f, 0.2f, 0.5f), 0.2f).SetEase(Ease.InBack);
-        transform.DOMove(targetPosition[index], 0.3f).SetEase(Ease.InBack);
+        transform.DOMove(targetPosition[index], 0.3f)
+                 .SetEase(Ease.InBack);
+
+
+
     }
 }

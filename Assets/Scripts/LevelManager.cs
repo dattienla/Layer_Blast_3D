@@ -7,6 +7,7 @@ using static UnityEditor.PlayerSettings;
 
 public class LevelManager : MonoBehaviour
 {
+    public GameObject obj;
     [SerializeField]
     private GameObject level1;
     Vector2Int head = new Vector2Int(1, 1); // vector của GridManager
@@ -18,6 +19,10 @@ public class LevelManager : MonoBehaviour
         transform.position = new Vector3(-2.5f, 0f, -15f);
         allBlockPref = GameObject.FindGameObjectsWithTag("blockPref");
         Level1();
+    }
+    private void Update()
+    {
+        Debug.Log(obj.GetComponent<GridCell>().layers.Count);
     }
     void Level1()
     {
@@ -39,7 +44,7 @@ public class LevelManager : MonoBehaviour
             GridCell cell = targetCells[i];
             GameObject cube = cubeTarget[i];
             // Debug.Log("Cube: " + cube.name );
-            cell.layers.Push(cube); // Thêm cube vào cell
+            cell.layers.Enqueue(cube); // Thêm cube vào cell
             GameObject neighborTop = cell.PeekTopLayer();
 
             cube.transform.DOMove(cell.transform.position, 1f).SetEase(Ease.InBack).OnComplete(() =>

@@ -8,7 +8,7 @@ using UnityEngine;
 public class BlockManager : MonoBehaviour
 {
     //public int cubeQuantity; // Số lượng cube con trong block
-    public string[] color; // Màu của block
+    // public string[] color; // Màu của block
     public bool isUsed = false; // Trạng thái của block
     public int quantity; // Số lượng lớp trong block
 
@@ -16,16 +16,16 @@ public class BlockManager : MonoBehaviour
     {
 
     }
-    // Trả về tất cả cube con
-    //public List<Transform> GetCubes()
-    //{
-    //    List<Transform> cubes = new List<Transform>();
-    //    foreach (Transform child in transform)
-    //    {
-    //        cubes.Add(child);
-    //    }
-    //    return cubes;
-    //}
+    //Trả về tất cả cube con
+    public List<Transform> GetCubes()
+    {
+        List<Transform> cubes = new List<Transform>();
+        foreach (Transform child in transform)
+        {
+            cubes.Add(child);
+        }
+        return cubes;
+    }
 
     // Lấy ra tất cả các cube con lớp ngoài cùng
     public List<Transform> GetCubeOutSite()
@@ -56,7 +56,7 @@ public class BlockManager : MonoBehaviour
     public HashSet<GridCell> GetOccupiedCells()
     {
         HashSet<GridCell> cells = new HashSet<GridCell>();
-        foreach (var cube in GetCubeOutSite())
+        foreach (var cube in GetCubes())
         {
             GridCell cell = GridManager.Instance.GetClosestCell(cube.position);
             if (cell != null)
@@ -78,10 +78,10 @@ public class BlockManager : MonoBehaviour
             {
                 GameObject neighborTop = neighbor.PeekTopLayer();
                 if (neighborTop == null) continue;
-
                 // Bỏ qua nếu là cube cùng block
                 if (neighborTop.transform.IsChildOf(this.transform)) continue;
                 neighborsOfBlock.Add(neighbor);
+
             }
         }
         return new List<GridCell>(neighborsOfBlock);
@@ -104,22 +104,19 @@ public class BlockManager : MonoBehaviour
                 });
             });
         }
-        if (quantity == 2)
+
+        foreach (var cube in GetCubeInSite())
         {
-            foreach (var cube in GetCubeInSite())
-            {
-                CubeManager cubeManager = cube.GetComponent<CubeManager>();
-                cubeManager.status = "cubeOut"; // cho cube trong thành cube ngoài 
-                cube.DOScale(new Vector3(1f, 1f, 1f), 0.4f).SetEase(Ease.InBack);
-            }
-            if (color[0] == color[1]) quantity -= 2;
-            else quantity--;
+            CubeManager cubeManager = cube.GetComponent<CubeManager>();
+            cubeManager.status = "cubeOut"; // cho cube trong thành cube ngoài 
+            cube.DOScale(new Vector3(1f, 1f, 1f), 0.4f).SetEase(Ease.InBack);
         }
+
         foreach (var cell in GetOccupiedCells())
         {
             if (cell.layers.Count > 0)
             {
-                cell.layers.Pop(); // Giảm số lượng layer trong ô
+                cell.layers.Dequeue(); // Giảm số lượng layer trong ô
             }
         }
     }
@@ -165,23 +162,28 @@ public class BlockManager : MonoBehaviour
     }
 
     // Lấy ra màu của block
-    public string GetColorOutSite()
+    public Color GetColorOutSite()
     {
-        string colorOutSite = "";
-        if (quantity == 2)
-        {
-            colorOutSite = color[0];
-        }
-        else if (quantity == 1)
-        {
-            colorOutSite = color[1];
-        }
-        return colorOutSite;
+        Color col = Color.white;
+        List<Transform> cubes = GetCubeOutSite();
+        if (cubes.Count == 0) return col;
+        col = cubes[0].GetComponent<Renderer>().material.color; // Lấy màu của cube ngoài cùng
+        return col;
+
+        //string colorOutSite = "";
+        //if (quantity == 2)
+        //{
+        //    colorOutSite = color[0];
+        //}
+        //else if (quantity == 1)
+        //{
+        //    colorOutSite = color[1];
+        //}
+        //return colorOutSite;
     }
     // Giảm số lượng lớp trong block
     public void RemoveQuantity()
     {
-        if (quantity > 0)
-            quantity--;
+        quantity--;
     }
 }

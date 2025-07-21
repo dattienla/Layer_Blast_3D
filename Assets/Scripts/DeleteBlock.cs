@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class DeleteBlock : MonoBehaviour
 {
     public HashSet<BlockManager> PreBlockExplode;
-    public static bool isExplode = true;
+    public bool isExplode = true;
+    public int cnt = 0;
+    public bool isDo = false;
     private void Start()
     {
         PreBlockExplode = new HashSet<BlockManager>();
@@ -13,17 +16,28 @@ public class DeleteBlock : MonoBehaviour
     public void ExplodeBlockAndNeighBors(BlockManager currentBlock)
     {
         isExplode = false;
-        string currentColor = "";
-        currentColor = currentBlock.GetColorOutSite();
+        Color currentColor = currentBlock.GetColorOutSite();
+        Debug.Log(GetBlockNeighbor(currentBlock).Count);
         foreach (var neighborBlock in GetBlockNeighbor(currentBlock))
         {
+            Debug.Log("Neighbor " + neighborBlock.name);
             // Nếu trùng màu
             if (neighborBlock.GetColorOutSite() == currentColor)
             {
+                currentBlock.RemoveQuantity(); ;
+                neighborBlock.RemoveQuantity();
                 PreBlockExplode.Add(neighborBlock);
                 PreBlockExplode.Add(currentBlock);
-                isExplode = true;
+                cnt++;
             }
+        }
+        if (cnt == 0)
+        {
+            isExplode = false;
+        }
+        else
+        {
+            isExplode = true;
         }
     }
 
@@ -35,10 +49,8 @@ public class DeleteBlock : MonoBehaviour
         foreach (GridCell neighbor in neighbors)
         {
             GameObject neighborTop = neighbor.PeekTopLayer();
-            if (neighborTop == null || neighborTop.transform.parent == null) continue;
             //GameObject neighborParent = neighborTop.transform.parent.gameObject;
             //if (neighborParent == null) continue;
-
             BlockManager neighborBlock = null;
 
             if (neighborTop.transform.parent != null && neighborTop.transform.parent.tag != "level")

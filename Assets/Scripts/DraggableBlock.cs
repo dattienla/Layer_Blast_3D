@@ -1,6 +1,9 @@
-﻿using System.Collections;
+﻿using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
+using UnityEditor.Timeline;
 using UnityEngine;
 
 public class DraggableBlock : MonoBehaviour
@@ -8,13 +11,15 @@ public class DraggableBlock : MonoBehaviour
     private Vector3 offset;
     private Camera cam;
     private bool isDragging = false;
+    bool isDraggable = true; // Biến này có thể được điều chỉnh từ bên ngoài để chặn việc kéo block
+    float timeDelay = 6.5f;
     // private Vector3 posDefault;
     private List<GridCell> previewCells = new List<GridCell>();
     private DoTweenAnim doTweenAnim;
-    public Queue<BlockManager> BlockQ;
+    public List<BlockManager> BlockQ;
     private void Awake()
     {
-        BlockQ = new Queue<BlockManager>();
+        BlockQ = new List<BlockManager>();
     }
     void Start()
     {
@@ -25,6 +30,10 @@ public class DraggableBlock : MonoBehaviour
 
     void Update()
     {
+        if (FindObjectOfType<DeleteBlock>().isDo == true)
+        {
+            return; // Nếu đang xử lý nổ block thì không cho kéo
+        }
         // PC: xử lý bằng chuột trái
         if (Input.GetMouseButtonDown(0))
         {
@@ -74,10 +83,12 @@ public class DraggableBlock : MonoBehaviour
 
     void TryStartDrag(Vector3 inputPos)
     {
+        if (!isDraggable) return; //  chặn bắt đầu kéo
+
         Ray ray = cam.ScreenPointToRay(inputPos);
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            if (hit.transform == transform) // chỉ bắt khi chạm đúng object này
+            if (hit.transform == transform)
             {
                 doTweenAnim.ZoomIn();
                 offset = transform.position - GetWorldPosition(inputPos);
@@ -85,6 +96,7 @@ public class DraggableBlock : MonoBehaviour
             }
         }
     }
+
 
     void DragBlock(Vector3 inputPos)
     {
@@ -146,14 +158,14 @@ public class DraggableBlock : MonoBehaviour
                 GridCell cell = targetCells[i];
                 // Snap vị trí và add vào cell
                 cube.position = cell.transform.position;
-                cell.layers.Push(cube.gameObject); // Tăng số lượng layer trong cell
+                cell.layers.Enqueue(cube.gameObject); // Tăng số lượng layer trong cell
             }
             int cnt = 0;
             BlockManager placedBlock = GetComponent<BlockManager>();
             placedBlock.isUsed = true; // Đánh dấu block đã được sử dụng
             QueueBlockManager.Instance.DeleteBlockFromQueue();
 
-            if (!BlockQ.Contains(placedBlock)) BlockQ.Enqueue(placedBlock);
+            if (!BlockQ.Contains(placedBlock)) BlockQ.Add(placedBlock);
 
             while (cnt != BlockQ.Count)
             {
@@ -164,32 +176,43 @@ public class DraggableBlock : MonoBehaviour
                     HashSet<BlockManager> H = FindObjectOfType<DeleteBlock>().GetBlockNeighbor(dat);
                     foreach (var h in H)
                     {
-                        if (!BlockQ.Contains(h)) BlockQ.Enqueue(h);
+                        if (!BlockQ.Contains(h)) BlockQ.Add(h);
                     }
                 }
             }
             StartCoroutine(CallKKMultipleTimes());
-            Destroy(this);
-            QueueBlockManager.Instance.CheckEndGame(); // Kiểm tra kết thúc game sau khi snap
+            isDraggable = false;
+            Invoke("CheckEndGameDelay", timeDelay + 0.5f);
         }
+    }
+    void CheckEndGameDelay()
+    {
+        QueueBlockManager.Instance.CheckEndGame(); // Kiểm tra kết thúc game sau khi snap
     }
     IEnumerator CallKKMultipleTimes()
     {
         int j = 0;
-        while (j < 5)
+        while (j < 10)
         {
-            KK();
             j++;
-            yield return new WaitForSeconds(0.7f);
+            FindObjectOfType<DeleteBlock>().isDo = true;
+            Debug.Log("Coroutine Loop: " + j + " | Time: " + Time.time);
+            KK();
+            if (FindObjectOfType<DeleteBlock>().isExplode == false) break;
+            FindObjectOfType<DeleteBlock>().cnt = 0;
+            yield return new WaitForSeconds(1.3f);
         }
+        FindObjectOfType<DeleteBlock>().isDo = false;
+        Debug.Log("Coroutine kết thúc");
     }
     void KK()
     {
-        Debug.Log("gg");
         Queue<BlockManager> temp = new Queue<BlockManager>(BlockQ);
+
         foreach (var dat in temp)
         {
             FindObjectOfType<DeleteBlock>().ExplodeBlockAndNeighBors(dat);
+            if (dat.quantity == 0) BlockQ.Remove(dat);
         }
         foreach (var pre in FindObjectOfType<DeleteBlock>().PreBlockExplode)
         {
@@ -221,7 +244,6 @@ public class DraggableBlock : MonoBehaviour
             {
                 cellValid = false;
             }
-
             if (cell != null && !previewCells.Contains(cell))
                 previewCells.Add(cell);
         }
@@ -235,36 +257,4 @@ public class DraggableBlock : MonoBehaviour
 
 
 }
-/*
-     void OnMouseDown()
-    {
-        doTweenAnim.ZoomIn(); // Phóng to block về trạng thái ban đầu
-        offset = transform.position - GetMouseWorldPosition();
-        isDragging = true;
-    }
 
-    void OnMouseDrag()
-    {
-        if (!isDragging) return;
-        Vector3 mousePos = GetMouseWorldPosition();
-        transform.position = mousePos + offset;
-        PreviewSnapCells();
-    }
-
-    void OnMouseUp()
-    {
-        isDragging = false;
-        foreach (var cell in previewCells)
-        {
-            cell.SetHighlight(false);
-        }
-        SnapToGrid();
-    }
-
-    Vector3 GetMouseWorldPosition()
-    {
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = cam.nearClipPlane;
-        Vector3 worldPos = cam.ScreenToWorldPoint(mousePos);
-        worldPos.y = 0f; // ép xuống mặt đất (trục y = 0)
-        return worldPos;*/
