@@ -4,25 +4,26 @@ using UnityEngine;
 
 public class DeleteBlock : MonoBehaviour
 {
+    public HashSet<BlockManager> PreBlockExplode;
+    public static bool isExplode = true;
+    private void Start()
+    {
+        PreBlockExplode = new HashSet<BlockManager>();
+    }
     public void ExplodeBlockAndNeighBors(BlockManager currentBlock)
     {
+        isExplode = false;
         string currentColor = "";
         currentColor = currentBlock.GetColorOutSite();
-        HashSet<BlockManager> PreBlockExplode = new HashSet<BlockManager>();
-        Queue<BlockManager> queue = new Queue<BlockManager>(currentBlock.GetComponent<DraggableBlock>().BlockQ);
-        queue.Dequeue();
-        foreach (var neighborBlock in queue)
+        foreach (var neighborBlock in GetBlockNeighbor(currentBlock))
         {
             // Nếu trùng màu
             if (neighborBlock.GetColorOutSite() == currentColor)
             {
                 PreBlockExplode.Add(neighborBlock);
                 PreBlockExplode.Add(currentBlock);
+                isExplode = true;
             }
-        }
-        foreach (var pre in PreBlockExplode)
-        {
-            pre.Explode();
         }
     }
 

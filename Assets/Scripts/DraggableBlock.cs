@@ -168,40 +168,34 @@ public class DraggableBlock : MonoBehaviour
                     }
                 }
             }
-            int j = 0;
-            while (j < 2)
-            {
-                Debug.Log(BlockQ.Count);
-                BlockManager blockQ = BlockQ.Peek();
-                if (blockQ != null)
-                {
-                    FindObjectOfType<DeleteBlock>().ExplodeBlockAndNeighBors(blockQ);
-                }
-                if (blockQ.quantity == 0)
-                {
-                    BlockQ.Dequeue();
-                }
-                j++;
-            }
-
-
-            //Sau khi snap, kiểm tra xem có block nào trùng màu không thì xoá đi
-            //if (placedBlock != null)
-            //{
-            //    FindObjectOfType<DeleteBlock>().ExplodeBlockAndNeighBors(placedBlock);
-            //}
-
-
-
-
-
-
-
-
-            // Sau khi đặt xong, huỷ chức năng kéo thả
+            StartCoroutine(CallKKMultipleTimes());
             Destroy(this);
             QueueBlockManager.Instance.CheckEndGame(); // Kiểm tra kết thúc game sau khi snap
         }
+    }
+    IEnumerator CallKKMultipleTimes()
+    {
+        int j = 0;
+        while (j < 5)
+        {
+            KK();
+            j++;
+            yield return new WaitForSeconds(0.7f);
+        }
+    }
+    void KK()
+    {
+        Debug.Log("gg");
+        Queue<BlockManager> temp = new Queue<BlockManager>(BlockQ);
+        foreach (var dat in temp)
+        {
+            FindObjectOfType<DeleteBlock>().ExplodeBlockAndNeighBors(dat);
+        }
+        foreach (var pre in FindObjectOfType<DeleteBlock>().PreBlockExplode)
+        {
+            pre.Explode();
+        }
+        FindObjectOfType<DeleteBlock>().PreBlockExplode.Clear();
     }
     /// <summary>
     /// Highlight các ô mà block sẽ snap vào

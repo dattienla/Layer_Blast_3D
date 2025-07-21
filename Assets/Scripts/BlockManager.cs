@@ -90,7 +90,7 @@ public class BlockManager : MonoBehaviour
     public void Explode()
     {
         foreach (var cube in GetCubeOutSite())
-        { 
+        {
             cube.DOScale(Vector3.one * 0.3f, 0.4f).SetEase(Ease.InBack).OnComplete(() =>
             {
                 cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 0.1f, cube.transform.position.z), 0.1f).OnComplete(() =>
@@ -112,7 +112,8 @@ public class BlockManager : MonoBehaviour
                 cubeManager.status = "cubeOut"; // cho cube trong thành cube ngoài 
                 cube.DOScale(new Vector3(1f, 1f, 1f), 0.4f).SetEase(Ease.InBack);
             }
-            quantity--;
+            if (color[0] == color[1]) quantity -= 2;
+            else quantity--;
         }
         foreach (var cell in GetOccupiedCells())
         {
