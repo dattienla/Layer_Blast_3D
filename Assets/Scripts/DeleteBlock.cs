@@ -17,15 +17,11 @@ public class DeleteBlock : MonoBehaviour
     {
         isExplode = false;
         Color currentColor = currentBlock.GetColorOutSite();
-        Debug.Log(GetBlockNeighbor(currentBlock).Count);
         foreach (var neighborBlock in GetBlockNeighbor(currentBlock))
-        {
-            Debug.Log("Neighbor " + neighborBlock.name);
+        {   
             // Nếu trùng màu
             if (neighborBlock.GetColorOutSite() == currentColor)
             {
-                currentBlock.RemoveQuantity(); ;
-                neighborBlock.RemoveQuantity();
                 PreBlockExplode.Add(neighborBlock);
                 PreBlockExplode.Add(currentBlock);
                 cnt++;

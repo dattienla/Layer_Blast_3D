@@ -10,7 +10,7 @@ public class BlockManager : MonoBehaviour
     //public int cubeQuantity; // Số lượng cube con trong block
     // public string[] color; // Màu của block
     public bool isUsed = false; // Trạng thái của block
-    public int quantity; // Số lượng lớp trong block
+   // public int quantity; // Số lượng lớp trong block
 
     private void Awake()
     {
@@ -182,8 +182,4 @@ public class BlockManager : MonoBehaviour
         //return colorOutSite;
     }
     // Giảm số lượng lớp trong block
-    public void RemoveQuantity()
-    {
-        quantity--;
-    }
 }

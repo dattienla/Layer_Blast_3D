@@ -15,13 +15,12 @@ public class GameManager : MonoBehaviour
     private GameObject inGamePanel;
     [SerializeField]
     private GameObject loseGamePanel;
-
+    public GameObject cellCheck;
     public int score;
-    private int scoreWin;
+    public int scoreWin;
     private void Awake()
     {
         score = 0;
-        scoreWin = 50;
         Instance = this;
     }
     // Start is called before the first frame update
@@ -33,6 +32,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        GameObject neighborTop = cellCheck.GetComponent<GridCell>().PeekTopLayer();
         scoreText.text = score.ToString() + "/" + scoreWin.ToString();
         CheckWinGame();
     }

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using UnityEditor.Timeline;
 using UnityEngine;
 
 public class DraggableBlock : MonoBehaviour
@@ -12,7 +11,7 @@ public class DraggableBlock : MonoBehaviour
     private Camera cam;
     private bool isDragging = false;
     bool isDraggable = true; // Biến này có thể được điều chỉnh từ bên ngoài để chặn việc kéo block
-    float timeDelay = 6.5f;
+    float timeDelay = 7.5f;
     // private Vector3 posDefault;
     private List<GridCell> previewCells = new List<GridCell>();
     private DoTweenAnim doTweenAnim;
@@ -180,6 +179,7 @@ public class DraggableBlock : MonoBehaviour
                     }
                 }
             }
+            Debug.Log(BlockQ.Count);
             StartCoroutine(CallKKMultipleTimes());
             isDraggable = false;
             Invoke("CheckEndGameDelay", timeDelay + 0.5f);
@@ -212,7 +212,7 @@ public class DraggableBlock : MonoBehaviour
         foreach (var dat in temp)
         {
             FindObjectOfType<DeleteBlock>().ExplodeBlockAndNeighBors(dat);
-            if (dat.quantity == 0) BlockQ.Remove(dat);
+            if (dat.GetColorOutSite() == Color.white) BlockQ.Remove(dat);
         }
         foreach (var pre in FindObjectOfType<DeleteBlock>().PreBlockExplode)
         {
