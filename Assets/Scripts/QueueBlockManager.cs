@@ -25,6 +25,7 @@ public class QueueBlockManager : MonoBehaviour
     private void Update()
     {
         // DeleteBlockFromQueue();
+        Debug.Log("Queue Block Count: " + queueBlock.Count);
         if (queueBlock.Count == 0)
         {
             PushBlock();
@@ -122,6 +123,7 @@ public class QueueBlockManager : MonoBehaviour
                 cnt--;
             }
         }
+        Debug.Log("Count of valid blocks: " + cnt);
         if (queueBlock.Count != 0 && cnt == 0)
         {
             GameManager.Instance.LoseGamePanel();

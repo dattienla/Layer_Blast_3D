@@ -3,28 +3,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class LevelManager : MonoBehaviour
 {
     [SerializeField]
     private GameObject level1;
     Vector2Int head = new Vector2Int(1, 1); // vector của GridManager
-    List<Vector2Int> gridPosOfChild = new List<Vector2Int>(); // danh sách vector tương đối của các cube con
-    List<Vector2Int> posCells = new List<Vector2Int>(); // danh sách các ô mục tiêu
-    GameObject[] gameObjects;
-    List<GameObject> allBlockPref = new List<GameObject>();
     List<GameObject> allBlockOutPref = new List<GameObject>();
     List<GameObject> allBlockInPref = new List<GameObject>();
+    List<GameObject> allBlockMat = new List<GameObject>();
     private void Start()
     {
         transform.position = new Vector3(-2.5f, 0f, -15f);
-        gameObjects = GameObject.FindGameObjectsWithTag("blockPref");
-        for (int i = 0; i < gameObjects.Length; i++)
-        {
-            allBlockPref.Add(gameObjects[i]);
-        }
         // Level1();
-        transform.DOScale(new Vector3(1f, 0.2f, 1f), 0.2f).SetEase(Ease.OutBack);
+        transform.DOScale(new Vector3(1f, 1f, 1f), 0.2f).SetEase(Ease.OutBack);
         Level();
     }
     void Level()
@@ -35,6 +28,11 @@ public class LevelManager : MonoBehaviour
             for (int j = 0; j < level1.transform.GetChild(i).transform.childCount; j++)
             {
                 GameObject obj = level1.transform.GetChild(i).GetChild(j).gameObject;
+                if (obj.tag == "cubeMatOut" || obj.tag == "cubeMatIn")
+                {
+                    allBlockMat.Add(obj);
+                    continue;
+                }
                 if (obj.GetComponent<CubeManager>().status == "cubeOut") allBlockOutPref.Add(obj);
                 else if (obj.GetComponent<CubeManager>().status == "cubeIn") allBlockInPref.Add(obj);
             }
@@ -69,35 +67,28 @@ public class LevelManager : MonoBehaviour
             BlockManager cube_BlockManger = obj.transform.parent.GetComponent<BlockManager>();
             cube_BlockManger.isUsed = true; // Đánh dấu block đã được sử dụng
         }
-    }
-    void Level1()
-    {
-        List<GameObject> cubeTarget = new List<GameObject>();
-        List<GridCell> targetCells = new List<GridCell>();
-        for (int i = 0; i < allBlockPref.Count; i++) // lấy toạ độ tương đối từng cube con và toạ độ cell tương ứng
+        foreach (GameObject obj in allBlockMat)
         {
-            transform.DOScale(new Vector3(1f, 0.2f, 1f), 0.2f).SetEase(Ease.OutBack);
-            cubeTarget.Add(allBlockPref[i].gameObject);
-            Vector2Int pos = new Vector2Int(Mathf.Abs((int)allBlockPref[i].transform.localPosition.z), Mathf.Abs((int)allBlockPref[i].transform.localPosition.x));
+            GameObject parent = obj.transform.parent.gameObject;
+            List<GameObject> objWithParent = new List<GameObject>();
+            foreach (GameObject op in allBlockOutPref)
+            {
+                if (op.transform.parent == obj.transform.parent)
+                {
+                    objWithParent.Add(op);
+                }
+            }
+            float maxX = -100;
+            float maxZ = -100;
+            foreach (var op in objWithParent)
+            {
+                if (op.transform.localPosition.x > maxX) maxX = op.transform.localPosition.x;
+                if (op.transform.localPosition.z > maxZ) maxZ = op.transform.localPosition.z;
+            }
+            Vector2Int pos = new Vector2Int(Mathf.Abs((int)maxZ), Mathf.Abs((int)maxX));
             Vector2Int posCell = pos + head; // tính toán vị trí của ô trong grid
             GridCell cell = GridManager.Instance.grid[posCell.x, posCell.y]; // lấy cell tương ứng với toạ độ
-            targetCells.Add(cell);
-            gridPosOfChild.Add(pos);
-            posCells.Add(posCell);
-        }
-        for (int i = posCells.Count - 1; i >= 0; i--)
-        {
-            GridCell cell = targetCells[i];
-            GameObject cube = cubeTarget[i];
-            // Debug.Log("Cube: " + cube.name );
-            cell.layers.Enqueue(cube); // Thêm cube vào cell
-            cube.transform.DOMove(cell.transform.position, 1f).SetEase(Ease.InBack).OnComplete(() =>
-            {
-                cube.transform.position = cell.transform.position;
-            });
-            BlockManager cube_BlockManger = cubeTarget[i].transform.parent.GetComponent<BlockManager>();
-            cube_BlockManger.isUsed = true; // Đánh dấu block đã được sử dụng
-            // Debug.Log("Cube " + cube.name + " snapped to cell at position: " + cell.transform.position);
+            obj.transform.position = cell.transform.position;
         }
     }
 }

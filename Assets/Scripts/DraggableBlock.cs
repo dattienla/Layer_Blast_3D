@@ -11,7 +11,6 @@ public class DraggableBlock : MonoBehaviour
     private Camera cam;
     private bool isDragging = false;
     bool isDraggable = true; // Biến này có thể được điều chỉnh từ bên ngoài để chặn việc kéo block
-    float timeDelay = 7.5f;
     // private Vector3 posDefault;
     private List<GridCell> previewCells = new List<GridCell>();
     private DoTweenAnim doTweenAnim;
@@ -157,6 +156,7 @@ public class DraggableBlock : MonoBehaviour
                 GridCell cell = targetCells[i];
                 // Snap vị trí và add vào cell
                 cube.position = cell.transform.position;
+                if (cube.tag == "cubeMatOut" || cube.tag == "cubeMatIn") continue;
                 cell.layers.Enqueue(cube.gameObject); // Tăng số lượng layer trong cell
             }
             int cnt = 0;
@@ -179,15 +179,13 @@ public class DraggableBlock : MonoBehaviour
                     }
                 }
             }
-            Debug.Log(BlockQ.Count);
             StartCoroutine(CallKKMultipleTimes());
             isDraggable = false;
-            Invoke("CheckEndGameDelay", timeDelay + 0.5f);
         }
     }
     void CheckEndGameDelay()
     {
-        QueueBlockManager.Instance.CheckEndGame(); // Kiểm tra kết thúc game sau khi snap
+        QueueBlockManager.Instance.CheckEndGame();
     }
     IEnumerator CallKKMultipleTimes()
     {
@@ -204,6 +202,7 @@ public class DraggableBlock : MonoBehaviour
         }
         FindObjectOfType<DeleteBlock>().isDo = false;
         Debug.Log("Coroutine kết thúc");
+        Invoke(nameof(CheckEndGameDelay), (j - 1f) * 1.3f + 0.5f);
     }
     void KK()
     {

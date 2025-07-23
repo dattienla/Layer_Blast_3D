@@ -8,7 +8,6 @@ public class GridManager : MonoBehaviour
     public int width;
     public int height;
     public GridCell[,] grid;
-    public GridCell cell;
 
     private void Awake()
     {

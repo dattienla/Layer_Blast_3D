@@ -10,7 +10,7 @@ public class BlockManager : MonoBehaviour
     //public int cubeQuantity; // Số lượng cube con trong block
     // public string[] color; // Màu của block
     public bool isUsed = false; // Trạng thái của block
-   // public int quantity; // Số lượng lớp trong block
+                                // public int quantity; // Số lượng lớp trong block
 
     private void Awake()
     {
@@ -22,7 +22,11 @@ public class BlockManager : MonoBehaviour
         List<Transform> cubes = new List<Transform>();
         foreach (Transform child in transform)
         {
-            cubes.Add(child);
+            if (child.tag != "cubeMatOut" && child.tag != "cubeMatIn")
+            {
+                cubes.Add(child);
+            }
+
         }
         return cubes;
     }
@@ -33,9 +37,13 @@ public class BlockManager : MonoBehaviour
         List<Transform> cubes = new List<Transform>();
         foreach (Transform child in transform)
         {
-            CubeManager cubeManager = child.GetComponent<CubeManager>();
-            if (cubeManager.status == "cubeOut")
-                cubes.Add(child);
+            if (child.tag != "cubeMatOut" && child.tag != "cubeMatIn")
+            {
+                CubeManager cubeManager = child.GetComponent<CubeManager>();
+                if (cubeManager.status == "cubeOut")
+                    cubes.Add(child);
+            }
+
         }
         return cubes;
     }
@@ -45,9 +53,12 @@ public class BlockManager : MonoBehaviour
         List<Transform> cubes = new List<Transform>();
         foreach (Transform child in transform)
         {
-            CubeManager cubeManager = child.GetComponent<CubeManager>();
-            if (cubeManager.status == "cubeIn")
-                cubes.Add(child);
+            if (child.tag != "cubeMatOut" && child.tag != "cubeMatIn")
+            {
+                CubeManager cubeManager = child.GetComponent<CubeManager>();
+                if (cubeManager.status == "cubeIn")
+                    cubes.Add(child);
+            }
         }
         return cubes;
     }
@@ -58,11 +69,15 @@ public class BlockManager : MonoBehaviour
         HashSet<GridCell> cells = new HashSet<GridCell>();
         foreach (var cube in GetCubes())
         {
-            GridCell cell = GridManager.Instance.GetClosestCell(cube.position);
-            if (cell != null)
+            if (cube.tag != "cubeMatOut" && cube.tag != "cubeMatIn")
             {
-                cells.Add(cell);
+                GridCell cell = GridManager.Instance.GetClosestCell(cube.position);
+                if (cell != null)
+                {
+                    cells.Add(cell);
+                }
             }
+
         }
         return cells;
     }
@@ -86,14 +101,54 @@ public class BlockManager : MonoBehaviour
         }
         return new List<GridCell>(neighborsOfBlock);
     }
+    // Lấy ra cubeMat ở ngoài
+    public GameObject GetCubeMatOutSite()
+    {
+        GameObject cubeMat = null;
+        foreach (Transform child in transform)
+        {
+            if (child.tag == "cubeMatOut")
+            {
+                cubeMat = child.gameObject;
+            }
+
+        }
+        return cubeMat;
+    }
+
+    // Lấy ra cubeMat ở trong
+    public GameObject GetCubeMatInSite()
+    {
+        GameObject cubeMat = null;
+        foreach (Transform child in transform)
+        {
+            if (child.tag == "cubeMatIn")
+            {
+                cubeMat = child.gameObject;
+            }
+
+        }
+        return cubeMat;
+    }
     // Phá hủy block
     public void Explode()
     {
+        Destroy(GetCubeMatOutSite());
+        if (GetCubeMatInSite() != null)
+        {
+            GetCubeMatInSite().transform.DOScale(new Vector3(1.4f, 1.4f, 1.4f), 0.1f).SetEase(Ease.InBack).OnComplete(() =>
+            {
+                GetCubeMatInSite().tag = "cubeMatOut";
+            });
+
+        }
+
         foreach (var cube in GetCubeOutSite())
         {
+            cube.gameObject.SetActive(true);
             cube.DOScale(Vector3.one * 0.3f, 0.4f).SetEase(Ease.InBack).OnComplete(() =>
             {
-                cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 0.1f, cube.transform.position.z), 0.1f).OnComplete(() =>
+                cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 2f, cube.transform.position.z), 0.1f).OnComplete(() =>
                 {
                     cube.DOMove(new Vector3(-0.15f, 0f, 7f), 0.7f)
                     .SetEase(Ease.InBack).OnComplete(() =>
@@ -111,7 +166,6 @@ public class BlockManager : MonoBehaviour
             cubeManager.status = "cubeOut"; // cho cube trong thành cube ngoài 
             cube.DOScale(new Vector3(1f, 1f, 1f), 0.4f).SetEase(Ease.InBack);
         }
-
         foreach (var cell in GetOccupiedCells())
         {
             if (cell.layers.Count > 0)
