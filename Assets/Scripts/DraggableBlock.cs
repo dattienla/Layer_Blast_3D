@@ -198,7 +198,7 @@ public class DraggableBlock : MonoBehaviour
             KK();
             if (FindObjectOfType<DeleteBlock>().isExplode == false) break;
             FindObjectOfType<DeleteBlock>().cnt = 0;
-            yield return new WaitForSeconds(1.3f);
+            yield return new WaitForSeconds(1.1f);
         }
         FindObjectOfType<DeleteBlock>().isDo = false;
         Debug.Log("Coroutine kết thúc");

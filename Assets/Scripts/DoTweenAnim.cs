@@ -20,7 +20,7 @@ public class DoTweenAnim : MonoBehaviour
     public void BlockStart()
     {
         // Dùng DOTween để di chuyển và thu nhỏ 
-        transform.DOScale(new Vector3(0.5f, 0.2f, 0.5f), 0.1f).OnComplete(() =>
+        transform.DOScale(new Vector3(0.7f, 0.2f, 0.7f), 0.1f).OnComplete(() =>
         {
             transform.DOMove(targetPosition[index], 0.3f).SetEase(Ease.OutBack);
         });
@@ -37,11 +37,9 @@ public class DoTweenAnim : MonoBehaviour
     }
     public void ZoomOut()
     {
-        transform.DOScale(new Vector3(0.5f, 0.2f, 0.5f), 0.2f).SetEase(Ease.InBack);
+        transform.DOScale(new Vector3(0.7f, 0.2f, 0.7f), 0.2f).SetEase(Ease.InBack);
         transform.DOMove(targetPosition[index], 0.3f)
                  .SetEase(Ease.InBack);
-
-
 
     }
 }

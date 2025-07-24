@@ -16,6 +16,20 @@ public class BlockManager : MonoBehaviour
     {
 
     }
+    void Start()
+    {
+        if (GetCubeMatInSite() != null)
+        {
+            GetCubeMatInSite().transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            GetCubeMatInSite().gameObject.SetActive(true);
+        }
+        foreach (var cube in GetCubes())
+        {
+            cube.gameObject.SetActive(false); // Ẩn tất cả cube con khi khởi tạo block
+        }
+        GetCubeMatOutSite().transform.localScale = new Vector3(1.4f, 1.4f, 1.4f);
+        GetCubeMatOutSite().gameObject.SetActive(true); // Hiển thị cubeMatOutSite
+    }
     //Trả về tất cả cube con
     public List<Transform> GetCubes()
     {
@@ -136,7 +150,7 @@ public class BlockManager : MonoBehaviour
         Destroy(GetCubeMatOutSite());
         if (GetCubeMatInSite() != null)
         {
-            GetCubeMatInSite().transform.DOScale(new Vector3(1.4f, 1.4f, 1.4f), 0.1f).SetEase(Ease.InBack).OnComplete(() =>
+            GetCubeMatInSite().transform.DOScale(new Vector3(1.4f, 1.4f, 1.4f), 0.2f).SetEase(Ease.InBack).OnComplete(() =>
             {
                 GetCubeMatInSite().tag = "cubeMatOut";
             });
@@ -150,7 +164,7 @@ public class BlockManager : MonoBehaviour
             {
                 cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 2f, cube.transform.position.z), 0.1f).OnComplete(() =>
                 {
-                    cube.DOMove(new Vector3(-0.15f, 0f, 7f), 0.7f)
+                    cube.DOMove(new Vector3(-0.15f, 0f, 7f), 0.5f)
                     .SetEase(Ease.InBack).OnComplete(() =>
                     {
                         GameManager.Instance.score++; // Tăng điểm khi phá hủy block
@@ -174,31 +188,6 @@ public class BlockManager : MonoBehaviour
             }
         }
     }
-    //void ExplodeInSite()
-    //{
-    //    foreach (var cube in GetCubeInSite())
-    //    {
-    //        cube.DOScale(Vector3.one * 0.3f, 0.4f).SetEase(Ease.InBack).OnComplete(() =>
-    //        {
-    //            cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 0.1f, cube.transform.position.z), 0.1f).OnComplete(() =>
-    //            {
-    //                cube.DOMove(new Vector3(-0.15f, 0f, 7f), 0.7f)
-    //                .SetEase(Ease.InBack).OnComplete(() =>
-    //                {
-    //                    GameManager.Instance.score++; // Tăng điểm khi phá hủy block
-    //                    Destroy(cube.gameObject);
-    //                });
-    //            });
-    //        });
-    //    }
-    //    foreach (var cell in GetOccupiedCells())
-    //    {
-    //        if (cell.layers.Count > 0)
-    //        {
-    //            cell.layers.Pop(); // Giảm số lượng layer trong ô
-    //        }
-    //    }
-    //}
 
     // Lấy ra toạ độ tương đối của các cube con 
     public List<Vector2Int> GetPositionOfCubes()

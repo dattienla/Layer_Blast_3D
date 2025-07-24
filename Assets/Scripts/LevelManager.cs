@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.XR;
 
 public class LevelManager : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class LevelManager : MonoBehaviour
     {
         transform.position = new Vector3(-2.5f, 0f, -15f);
         // Level1();
-        transform.DOScale(new Vector3(1f, 1f, 1f), 0.2f).SetEase(Ease.OutBack);
+        transform.DOScale(new Vector3(1f, 1f, 1f), 02f).SetEase(Ease.OutBack);
         Level();
     }
     void Level()
@@ -78,17 +79,58 @@ public class LevelManager : MonoBehaviour
                     objWithParent.Add(op);
                 }
             }
-            float maxX = -100;
-            float maxZ = -100;
-            foreach (var op in objWithParent)
-            {
-                if (op.transform.localPosition.x > maxX) maxX = op.transform.localPosition.x;
-                if (op.transform.localPosition.z > maxZ) maxZ = op.transform.localPosition.z;
-            }
-            Vector2Int pos = new Vector2Int(Mathf.Abs((int)maxZ), Mathf.Abs((int)maxX));
+            Vector3 cubeCenter = Vector3.zero;
+            foreach (var cube in objWithParent)
+                cubeCenter += cube.transform.localPosition;
+
+            cubeCenter /= objWithParent.Count;
+            // Tính offset giữa pivot và mesh center trong local space
+            MeshFilter mf = obj.GetComponent<MeshFilter>();
+            Vector3 meshCenterLocal = mf.sharedMesh.bounds.center;
+            Vector3 offset = obj.transform.localRotation * meshCenterLocal;
+            Vector3 newLocalPos = cubeCenter + offset * -1f;
+            int X = Mathf.RoundToInt(newLocalPos.x);
+            int Z = Mathf.RoundToInt(newLocalPos.z);
+            int Y = Mathf.RoundToInt(newLocalPos.y);
+            obj.transform.localPosition = new Vector3(X, Y, Z);
+            Vector2Int pos = new Vector2Int(Mathf.Abs(Z), Mathf.Abs(X));
             Vector2Int posCell = pos + head; // tính toán vị trí của ô trong grid
             GridCell cell = GridManager.Instance.grid[posCell.x, posCell.y]; // lấy cell tương ứng với toạ độ
-            obj.transform.position = cell.transform.position;
+            obj.transform.DOMove(cell.transform.position, 1f).SetEase(Ease.InBack).OnComplete(() =>
+            {
+
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //float sumX = 0;
+            //float sumZ = 0;
+            //foreach (var op in objWithParent)
+            //{
+            //    sumX += op.transform.localPosition.x;
+            //    sumZ += op.transform.localPosition.z;
+            //}
+            //int X = (int)Math.Ceiling(sumX / objWithParent.Count);
+            //int Z = (int)Math.Ceiling(sumZ / objWithParent.Count);
+            //Vector2Int pos = new Vector2Int(Mathf.Abs(Z), Mathf.Abs(X));
+            //Vector2Int posCell = pos + head; // tính toán vị trí của ô trong grid
+            //GridCell cell = GridManager.Instance.grid[posCell.x, posCell.y]; // lấy cell tương ứng với toạ độ
+            //obj.transform.DOMove(cell.transform.position, 1f).SetEase(Ease.InBack).OnComplete(() =>
+            //{
+            //    obj.transform.position = cell.transform.position;
+            //});
         }
     }
 }
