@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class QueueBlockManager : MonoBehaviour
@@ -12,7 +14,7 @@ public class QueueBlockManager : MonoBehaviour
     private Vector3 slot2 = new Vector3(0, 0, -4);
     private Vector3 slot3 = new Vector3(2, 0, -4);
     [SerializeField]
-    private GameObject[] block_;
+    private GameObject[] blockOfPlayer;
     private void Awake()
     {
         Instance = this;
@@ -20,41 +22,44 @@ public class QueueBlockManager : MonoBehaviour
     private void Start()
     {
         allBlocks = GameObject.FindGameObjectsWithTag(blockTag);
-        //PushBlock();
     }
+
     private void Update()
     {
-        // DeleteBlockFromQueue();
-        Debug.Log("Queue Block Count: " + queueBlock.Count);
+        CheckAndAddBlock();
+        //CheckEndGame();
+    }
+    // kiểm tra và thêm block vào hàng đợi
+    void CheckAndAddBlock()
+    {
         if (queueBlock.Count == 0)
         {
             PushBlock();
         }
-        //CheckEndGame();
     }
     // thêm 3 block vào hàng đợi
     private void AddBlockToQueue()
     {
-        float threshold = 0.8f; // khoảng cách cho phép
-
-        for (int i = 0; i < allBlocks.Length; i++)
+        for (int i = 0; i < blockOfPlayer.Length; i++)
         {
-            Vector3 pos = allBlocks[i].transform.position;
+            Transform parent = blockOfPlayer[i].transform;
 
-            if (Vector3.Distance(pos, slot1) < threshold ||
-                Vector3.Distance(pos, slot2) < threshold ||
-                Vector3.Distance(pos, slot3) < threshold)
+            if (parent.childCount == 0) continue; // bỏ qua nếu không có con
+
+            Transform child = parent.GetChild(0);
+
+            if (!queueBlock.Contains(child.gameObject)) // tránh thêm trùng
             {
-                if (!queueBlock.Contains(allBlocks[i])) // tránh thêm trùng
-                {
-                    queueBlock.Add(allBlocks[i]);
-                }
+                queueBlock.Add(child.gameObject);
             }
+            child.SetParent(null); // tách ra khỏi cha
             if (queueBlock.Count == 3)
             {
                 return;
             }
         }
+
+
     }
     // xóa block đã sử dụng khỏi hàng đợi
     public void DeleteBlockFromQueue()
@@ -72,17 +77,20 @@ public class QueueBlockManager : MonoBehaviour
     // kiểm soát số lượng block hiển thị trên màn hình
     void PushBlock()
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < blockOfPlayer.Length; i++)
         {
-            foreach (var block in allBlocks)
+            Transform parent = blockOfPlayer[i].transform;
+
+            if (parent.childCount == 0) continue; // bỏ qua nếu không có con
+
+            Transform child = parent.GetChild(0);
+
+            BlockManager blockManager = child.GetComponent<BlockManager>();
+            DoTweenAnim doTweenAnim = child.GetComponent<DoTweenAnim>();
+
+            if (!blockManager.isUsed && doTweenAnim.index == i + 1)
             {
-                BlockManager blockManger = block.GetComponent<BlockManager>();
-                DoTweenAnim doTweenAnim = block.GetComponent<DoTweenAnim>();
-                if (blockManger.isUsed == false && doTweenAnim.index == i + 1)
-                {
-                    doTweenAnim.BlockStart();
-                    break;
-                }
+                doTweenAnim.BlockStart();
             }
         }
         AddBlockToQueue();
@@ -91,6 +99,19 @@ public class QueueBlockManager : MonoBehaviour
     // check end game
     public void CheckEndGame()
     {
+        int n = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            if (blockOfPlayer[i].transform.childCount == 0)
+            {
+                n++;
+            }
+        }
+        if (n == 3 && queueBlock.Count == 0)
+        {
+            GameManager.Instance.LoseGamePanel();
+            Debug.Log("End Game");
+        }
         int cnt = queueBlock.Count;
         foreach (GameObject block in queueBlock)
         {
@@ -123,7 +144,6 @@ public class QueueBlockManager : MonoBehaviour
                 cnt--;
             }
         }
-        Debug.Log("Count of valid blocks: " + cnt);
         if (queueBlock.Count != 0 && cnt == 0)
         {
             GameManager.Instance.LoseGamePanel();

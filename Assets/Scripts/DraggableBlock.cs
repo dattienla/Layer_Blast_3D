@@ -195,16 +195,16 @@ public class DraggableBlock : MonoBehaviour
             j++;
             FindObjectOfType<DeleteBlock>().isDo = true;
             Debug.Log("Coroutine Loop: " + j + " | Time: " + Time.time);
-            KK();
+            ExpldeBlock();
             if (FindObjectOfType<DeleteBlock>().isExplode == false) break;
             FindObjectOfType<DeleteBlock>().cnt = 0;
             yield return new WaitForSeconds(1.1f);
         }
         FindObjectOfType<DeleteBlock>().isDo = false;
         Debug.Log("Coroutine kết thúc");
-        Invoke(nameof(CheckEndGameDelay), (j - 1f) * 1.3f + 0.5f);
+        Invoke(nameof(CheckEndGameDelay), (j - 1f) * 1.3f + 0.3f);
     }
-    void KK()
+    void ExpldeBlock()
     {
         Queue<BlockManager> temp = new Queue<BlockManager>(BlockQ);
 

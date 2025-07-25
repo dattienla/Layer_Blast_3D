@@ -24,7 +24,6 @@ public class GridManager : MonoBehaviour
             }
         }
     }
-
     // lấy ra cell tại toạ độ nào đó trong grid
     public GridCell GetCellInPos(Vector2Int pos)
     {

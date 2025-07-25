@@ -45,7 +45,6 @@ public class GameManager : MonoBehaviour
     private GameObject settingBoard;
     /// 
 
-
     [SerializeField]
     private GameObject loseGamePanel;
     public int score;
@@ -60,12 +59,15 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         InGamePanel();
+        MusicButtonOff();
+        SoundButtonOff();
     }
 
     // Update is called once per frame
     void Update()
     {
-        scoreText.text = score.ToString() + "/" + scoreWin.ToString();
+        if (score >= scoreWin) scoreText.text = scoreWin.ToString() + "/" + scoreWin.ToString();
+        else scoreText.text = score.ToString() + "/" + scoreWin.ToString();
         CheckWinGame();
     }
 
@@ -92,8 +94,12 @@ public class GameManager : MonoBehaviour
     {
         if (score >= scoreWin)
         {
-            WinGamePanel();
+            Invoke("CheckWinGameDelay", 1.3f);
         }
+    }
+    void CheckWinGameDelay()
+    {
+        WinGamePanel();
     }
     public void LoseGamePanel()
     {
@@ -104,7 +110,8 @@ public class GameManager : MonoBehaviour
     }
     public void Reset()
     {
-        SceneManager.LoadScene(0);
+        string currentSceneName = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(currentSceneName);
     }
 
 
@@ -135,27 +142,35 @@ public class GameManager : MonoBehaviour
     }
     public void SoundButtonOn()
     {
-        AudioListener.volume = 1f;
-        soundButtonOn.SetActive(!AudioListener.volume.Equals(0f));
-        soundButtonOff.SetActive(AudioListener.volume.Equals(0f));
+        // AudioListener.volume = 1f;
+        //soundButtonOn.SetActive(!AudioListener.volume.Equals(0f));
+        //soundButtonOff.SetActive(AudioListener.volume.Equals(0f));
+        soundButtonOff.SetActive(true);
+        soundButtonOn.SetActive(false);
     }
     public void SoundButtonOff()
     {
-        AudioListener.volume = 0f;
-        soundButtonOn.SetActive(!AudioListener.volume.Equals(0f));
-        soundButtonOff.SetActive(AudioListener.volume.Equals(0f));
+        //AudioListener.volume = 0f;
+        //soundButtonOn.SetActive(!AudioListener.volume.Equals(0f));
+        //soundButtonOff.SetActive(AudioListener.volume.Equals(0f));
+        soundButtonOn.SetActive(true);
+        soundButtonOff.SetActive(false);
     }
     public void MusicButtonOn()
     {
-        backgroundAudio.mute = false;
-        musicButtonOn.SetActive(!backgroundAudio.mute);
-        musicButtonOff.SetActive(backgroundAudio.mute);
+        //backgroundAudio.mute = false;
+        //musicButtonOn.SetActive(!backgroundAudio.mute);
+        //musicButtonOff.SetActive(backgroundAudio.mute);
+        musicButtonOff.SetActive(true);
+        musicButtonOn.SetActive(false);
     }
     public void MusicButtonOff()
     {
-        backgroundAudio.mute = true;
-        musicButtonOn.SetActive(!backgroundAudio.mute);
-        musicButtonOff.SetActive(backgroundAudio.mute);
+        // backgroundAudio.mute = true;
+        //musicButtonOn.SetActive(!backgroundAudio.mute);
+        //musicButtonOff.SetActive(backgroundAudio.mute);
+        musicButtonOn.SetActive(true);
+        musicButtonOff.SetActive(false);
     }
     public void VibrateButtonOn()
     {
@@ -178,6 +193,13 @@ public class GameManager : MonoBehaviour
 
     }
     ///////
-
-
+    public void NextLevel()
+    {
+        int sceneIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(sceneIndex + 1);
+    }
+    public void ReturnLevel1()
+    {
+        SceneManager.LoadScene(0);
+    }
 }

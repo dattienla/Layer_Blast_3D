@@ -17,8 +17,7 @@ public class LevelManager : MonoBehaviour
     private void Start()
     {
         transform.position = new Vector3(-2.5f, 0f, -15f);
-        // Level1();
-        transform.DOScale(new Vector3(1f, 1f, 1f), 02f).SetEase(Ease.OutBack);
+        transform.DOScale(new Vector3(1f, 0.8f, 1f), 0.1f).SetEase(Ease.OutBack);
         Level();
     }
     void Level()
@@ -46,7 +45,7 @@ public class LevelManager : MonoBehaviour
             cell.layers.Enqueue(obj); // Thêm cube vào cell
 
             // Debug.Log(cell.name + " đã add " + obj.name);
-            obj.transform.DOMove(cell.transform.position, 1f).SetEase(Ease.InBack).OnComplete(() =>
+            obj.transform.DOMove(cell.transform.position, 0.5f).SetEase(Ease.InBack).OnComplete(() =>
             {
                 obj.transform.position = cell.transform.position;
             });
@@ -61,7 +60,7 @@ public class LevelManager : MonoBehaviour
             cell.layers.Enqueue(obj); // Thêm cube vào cell
 
             // Debug.Log(cell.name + " đã add " + obj.name);
-            obj.transform.DOMove(cell.transform.position, 1f).SetEase(Ease.InBack).OnComplete(() =>
+            obj.transform.DOMove(cell.transform.position, 0.5f).SetEase(Ease.InBack).OnComplete(() =>
             {
                 obj.transform.position = cell.transform.position;
             });
@@ -96,41 +95,8 @@ public class LevelManager : MonoBehaviour
             Vector2Int pos = new Vector2Int(Mathf.Abs(Z), Mathf.Abs(X));
             Vector2Int posCell = pos + head; // tính toán vị trí của ô trong grid
             GridCell cell = GridManager.Instance.grid[posCell.x, posCell.y]; // lấy cell tương ứng với toạ độ
-            obj.transform.DOMove(cell.transform.position, 1f).SetEase(Ease.InBack).OnComplete(() =>
-            {
+            obj.transform.DOMove(cell.transform.position, 0.5f).SetEase(Ease.InBack);
 
-            });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            //float sumX = 0;
-            //float sumZ = 0;
-            //foreach (var op in objWithParent)
-            //{
-            //    sumX += op.transform.localPosition.x;
-            //    sumZ += op.transform.localPosition.z;
-            //}
-            //int X = (int)Math.Ceiling(sumX / objWithParent.Count);
-            //int Z = (int)Math.Ceiling(sumZ / objWithParent.Count);
-            //Vector2Int pos = new Vector2Int(Mathf.Abs(Z), Mathf.Abs(X));
-            //Vector2Int posCell = pos + head; // tính toán vị trí của ô trong grid
-            //GridCell cell = GridManager.Instance.grid[posCell.x, posCell.y]; // lấy cell tương ứng với toạ độ
-            //obj.transform.DOMove(cell.transform.position, 1f).SetEase(Ease.InBack).OnComplete(() =>
-            //{
-            //    obj.transform.position = cell.transform.position;
-            //});
         }
     }
 }

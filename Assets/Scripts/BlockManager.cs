@@ -156,7 +156,6 @@ public class BlockManager : MonoBehaviour
             });
 
         }
-
         foreach (var cube in GetCubeOutSite())
         {
             cube.gameObject.SetActive(true);
@@ -169,11 +168,11 @@ public class BlockManager : MonoBehaviour
                     {
                         GameManager.Instance.score++; // Tăng điểm khi phá hủy block
                         Destroy(cube.gameObject);
+                        // Debug.Log(GetCubes().Count);
                     });
                 });
             });
         }
-
         foreach (var cube in GetCubeInSite())
         {
             CubeManager cubeManager = cube.GetComponent<CubeManager>();
@@ -188,7 +187,6 @@ public class BlockManager : MonoBehaviour
             }
         }
     }
-
     // Lấy ra toạ độ tương đối của các cube con 
     public List<Vector2Int> GetPositionOfCubes()
     {
@@ -213,16 +211,15 @@ public class BlockManager : MonoBehaviour
         col = cubes[0].GetComponent<Renderer>().material.color; // Lấy màu của cube ngoài cùng
         return col;
 
-        //string colorOutSite = "";
-        //if (quantity == 2)
-        //{
-        //    colorOutSite = color[0];
-        //}
-        //else if (quantity == 1)
-        //{
-        //    colorOutSite = color[1];
-        //}
-        //return colorOutSite;
     }
-    // Giảm số lượng lớp trong block
+
+    // lấy ra trọng tâm của block
+    public Vector3 GetCenterOfBlock()
+    {
+        GameObject obj = GetCubeMatOutSite();
+        MeshFilter mf = obj.GetComponent<MeshFilter>();
+        Vector3 meshCenterLocal = mf.sharedMesh.bounds.center;
+        return meshCenterLocal;
+    }
+
 }
