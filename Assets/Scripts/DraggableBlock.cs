@@ -128,25 +128,41 @@ public class DraggableBlock : MonoBehaviour
     /// </summary>
     void SnapToGrid()
     {
-        List<GridCell> targetCells = new List<GridCell>();
-
         // Kiểm tra tất cả cube con xem có đủ ô trống để snap không
+        List<GridCell> targetCells = new List<GridCell>();
+        Vector3 worldPos0 = transform.GetChild(0).position;
+        GridCell cell0 = GridManager.Instance.GetClosestCell(worldPos0);
+
+        if (cell0 == null || !cell0.IsEmpty())
+        {
+            doTweenAnim.ZoomOut(); // Trả về vị trí mặc định nếu không hợp lệ
+        }
+        else
+        {
+            targetCells.Add(cell0); // Lưu lại cell hợp lệ
+        }
+
         foreach (Transform cube in transform)
         {
-            Vector3 worldPos = cube.position;
-            GridCell cell = GridManager.Instance.GetClosestCell(worldPos);
-
-            if (cell == null || !cell.IsEmpty())
+            if (cube == transform.GetChild(0)) continue; // Bỏ qua cube đầu tiên đã kiểm tra
+            Vector2Int cubeAbs = new Vector2Int(Mathf.Abs((int)cube.localPosition.z), Mathf.Abs((int)cube.localPosition.x));
+            Vector2Int cube0Abs = new Vector2Int(Mathf.Abs((int)transform.GetChild(0).localPosition.z), Mathf.Abs((int)transform.GetChild(0).localPosition.x));
+            Vector2Int dis = cubeAbs - cube0Abs;
+            if (cell0 != null)
             {
-                doTweenAnim.ZoomOut(); // Trả về vị trí mặc định nếu không hợp lệ
-            }
-            else
-            {
-                targetCells.Add(cell); // Lưu lại cell hợp lệ
+                Vector2Int posCell = new Vector2Int(cell0.x + dis.x, cell0.y + dis.y); // tính toán vị trí của ô trong grid
+                GridCell cell = GridManager.Instance.grid[posCell.x, posCell.y]; // lấy cell tương ứng với toạ độ
+                if (cell == null || !cell.IsEmpty())
+                {
+                    doTweenAnim.ZoomOut(); // Trả về vị trí mặc định nếu không hợp lệ
+                }
+                else
+                {
+                    targetCells.Add(cell); // Lưu lại cell hợp lệ
+                }
             }
 
         }
-
         // Snap toàn bộ cùng lúc
         if (targetCells.Count == transform.childCount)
         {
@@ -222,6 +238,7 @@ public class DraggableBlock : MonoBehaviour
     /// <summary>
     /// Highlight các ô mà block sẽ snap vào
     /// </summary>
+
     void PreviewSnapCells()
     {
         // Xóa highlight cũ
@@ -233,27 +250,45 @@ public class DraggableBlock : MonoBehaviour
         previewCells.Clear();
 
         bool cellValid = true;
+        Vector3 worldPos0 = transform.GetChild(0).position;
+        GridCell cell0 = GridManager.Instance.GetClosestCell(worldPos0);
 
+        if (cell0 == null || !cell0.IsEmpty())
+        {
+            cellValid = false;
+        }
+        else
+        {
+            previewCells.Add(cell0); // Lưu lại cell hợp lệ
+        }
         foreach (Transform cube in transform)
         {
-            Vector3 worldPos = cube.position;
-            GridCell cell = GridManager.Instance.GetClosestCell(worldPos);
-
-            if (cell == null || !cell.IsEmpty())
+            if (cube == transform.GetChild(0)) continue; // Bỏ qua cube đầu tiên đã kiểm tra
+            Vector2Int cubeAbs = new Vector2Int(Mathf.Abs((int)cube.localPosition.z), Mathf.Abs((int)cube.localPosition.x));
+            Vector2Int cube0Abs = new Vector2Int(Mathf.Abs((int)transform.GetChild(0).localPosition.z), Mathf.Abs((int)transform.GetChild(0).localPosition.x));
+            Vector2Int dis = cubeAbs - cube0Abs;
+            if (cell0 != null)
             {
-                cellValid = false;
+                Vector2Int posCell = new Vector2Int(cell0.x + dis.x, cell0.y + dis.y); // tính toán vị trí của ô trong grid
+                GridCell cell = GridManager.Instance.grid[posCell.x, posCell.y]; // lấy cell tương ứng với toạ độ
+                if (cell == null || !cell.IsEmpty())
+                {
+                    cellValid = false;
+                }
+                else
+                {
+                    previewCells.Add(cell); // Lưu lại cell hợp lệ
+                }
             }
-            if (cell != null && !previewCells.Contains(cell))
-                previewCells.Add(cell);
         }
-
         // Highlight màu khác tùy theo hợp lệ
-        foreach (var cell in previewCells)
+        if (previewCells.Count == transform.childCount)
         {
-            cell.SetHighlight(true, cellValid);
+            foreach (var cell in previewCells)
+            {
+                cell.SetHighlight(true, cellValid);
+            }
         }
     }
-
-
 }
 

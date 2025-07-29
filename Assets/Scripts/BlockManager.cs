@@ -159,6 +159,7 @@ public class BlockManager : MonoBehaviour
         foreach (var cube in GetCubeOutSite())
         {
             cube.gameObject.SetActive(true);
+            GameManager.Instance.sfxSource.PlayOneShot(GameManager.Instance.explodeAudio);
             cube.DOScale(Vector3.one * 0.3f, 0.4f).SetEase(Ease.InBack).OnComplete(() =>
             {
                 cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 2f, cube.transform.position.z), 0.1f).OnComplete(() =>
@@ -166,7 +167,9 @@ public class BlockManager : MonoBehaviour
                     cube.DOMove(new Vector3(-0.15f, 0f, 7f), 0.5f)
                     .SetEase(Ease.InBack).OnComplete(() =>
                     {
+
                         GameManager.Instance.score++; // Tăng điểm khi phá hủy block
+                        GameManager.Instance.CheckWinGame(); // Kiểm tra thắng game
                         Destroy(cube.gameObject);
                         // Debug.Log(GetCubes().Count);
                     });

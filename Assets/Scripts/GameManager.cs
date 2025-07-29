@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -49,7 +49,9 @@ public class GameManager : MonoBehaviour
     private GameObject loseGamePanel;
     public int score;
     public int scoreWin;
-    public AudioSource backgroundAudio;
+    public AudioSource backgroundSource;
+    public AudioSource sfxSource;
+    public AudioClip explodeAudio;
     private void Awake()
     {
         score = 0;
@@ -58,9 +60,22 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        int music = PlayerPrefs.GetInt("Music", 1); // 1 = bật, 0 = tắt
+        bool isMusicMuted = (music == 0);
+
+        backgroundSource.mute = isMusicMuted;
+
+        if (musicButtonOn != null) musicButtonOn.SetActive(!isMusicMuted);
+        if (musicButtonOff != null) musicButtonOff.SetActive(isMusicMuted);
+
+        int sound = PlayerPrefs.GetInt("Sound", 1); // 1 = bật, 0 = tắt
+        bool isSoundMuted = (sound == 0);
+
+        sfxSource.mute = isSoundMuted;
+
+        if (soundButtonOn != null) musicButtonOn.SetActive(!isSoundMuted);
+        if (soundButtonOff != null) musicButtonOff.SetActive(isSoundMuted);
         InGamePanel();
-        MusicButtonOff();
-        SoundButtonOff();
     }
 
     // Update is called once per frame
@@ -68,7 +83,7 @@ public class GameManager : MonoBehaviour
     {
         if (score >= scoreWin) scoreText.text = scoreWin.ToString() + "/" + scoreWin.ToString();
         else scoreText.text = score.ToString() + "/" + scoreWin.ToString();
-        CheckWinGame();
+        //CheckWinGame();
     }
 
     // InGamePanel
@@ -90,11 +105,11 @@ public class GameManager : MonoBehaviour
         winGamePanel.SetActive(true);
         loseGamePanel.SetActive(false);
     }
-    void CheckWinGame()
+    public void CheckWinGame()
     {
         if (score >= scoreWin)
         {
-            Invoke("CheckWinGameDelay", 1.3f);
+            Invoke("CheckWinGameDelay", 0f);
         }
     }
     void CheckWinGameDelay()
@@ -123,55 +138,58 @@ public class GameManager : MonoBehaviour
         settingPanel.GetComponent<CanvasGroup>().DOFade(1f, 0.3f);
         settingBoard.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack);
         inGamePanel.SetActive(false);
-        //musicButtonOn.SetActive(!backgroundAudio.mute);
-        //musicButtonOff.SetActive(backgroundAudio.mute);
-        //soundButtonOn.SetActive(!AudioListener.volume.Equals(0f));
-        //soundButtonOff.SetActive(AudioListener.volume.Equals(0f));
+        musicButtonOn.SetActive(!backgroundSource.mute);
+        musicButtonOff.SetActive(backgroundSource.mute);
+        soundButtonOn.SetActive(!sfxSource.mute);
+        soundButtonOff.SetActive(sfxSource.mute);
     }
     public void CloseSettingButton()
     {
         settingPanel.GetComponent<CanvasGroup>().alpha = 1;
         settingPanel.transform.localScale = Vector3.one;
         settingPanel.GetComponent<CanvasGroup>().DOFade(0f, 0.3f);
-        //settingPanel.transform.DOMove(new Vector3(445f, -950f, 0f), 0.3f);
         settingBoard.transform.DOScale(0f, 0.3f).OnComplete(() =>
         {
             settingPanel.SetActive(false);
         });
         inGamePanel.SetActive(true);
     }
-    public void SoundButtonOn()
+    public void SoundButton()
     {
-        // AudioListener.volume = 1f;
-        //soundButtonOn.SetActive(!AudioListener.volume.Equals(0f));
-        //soundButtonOff.SetActive(AudioListener.volume.Equals(0f));
-        soundButtonOff.SetActive(true);
-        soundButtonOn.SetActive(false);
+        if (PlayerPrefs.GetInt("Sound") == 1)
+        {
+            sfxSource.mute = true;
+            PlayerPrefs.SetInt("Sound", 0);
+            PlayerPrefs.Save();
+        }
+        else
+        {
+            sfxSource.mute = false;
+            PlayerPrefs.SetInt("Sound", 1);
+            PlayerPrefs.Save();
+        }
+        soundButtonOn.SetActive(!sfxSource.mute);
+        soundButtonOff.SetActive(sfxSource.mute);
     }
-    public void SoundButtonOff()
+    public void MusicButton()
     {
-        //AudioListener.volume = 0f;
-        //soundButtonOn.SetActive(!AudioListener.volume.Equals(0f));
-        //soundButtonOff.SetActive(AudioListener.volume.Equals(0f));
-        soundButtonOn.SetActive(true);
-        soundButtonOff.SetActive(false);
+        if (PlayerPrefs.GetInt("Music") == 1)
+        {
+            backgroundSource.mute = true;
+            PlayerPrefs.SetInt("Music", 0);
+            PlayerPrefs.Save();
+        }
+        else
+        {
+            backgroundSource.mute = false;
+            PlayerPrefs.SetInt("Music", 1);
+            PlayerPrefs.Save();
+        }
+        musicButtonOn.SetActive(!backgroundSource.mute);
+        musicButtonOff.SetActive(backgroundSource.mute);
+
     }
-    public void MusicButtonOn()
-    {
-        //backgroundAudio.mute = false;
-        //musicButtonOn.SetActive(!backgroundAudio.mute);
-        //musicButtonOff.SetActive(backgroundAudio.mute);
-        musicButtonOff.SetActive(true);
-        musicButtonOn.SetActive(false);
-    }
-    public void MusicButtonOff()
-    {
-        // backgroundAudio.mute = true;
-        //musicButtonOn.SetActive(!backgroundAudio.mute);
-        //musicButtonOff.SetActive(backgroundAudio.mute);
-        musicButtonOn.SetActive(true);
-        musicButtonOff.SetActive(false);
-    }
+
     public void VibrateButtonOn()
     {
 

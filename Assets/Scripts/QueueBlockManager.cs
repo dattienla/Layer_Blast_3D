@@ -27,7 +27,6 @@ public class QueueBlockManager : MonoBehaviour
     private void Update()
     {
         CheckAndAddBlock();
-        //CheckEndGame();
     }
     // kiểm tra và thêm block vào hàng đợi
     void CheckAndAddBlock()

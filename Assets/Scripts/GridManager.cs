@@ -41,7 +41,7 @@ public class GridManager : MonoBehaviour
     /// </summary>
     public GridCell GetClosestCell(Vector3 worldPos)
     {
-        float minDist = 0.5f; // khoảng cách tối thiểu để snap
+        float minDist = 1.2f; // khoảng cách tối thiểu để snap
         GridCell closest = null;
 
         foreach (var cell in grid)
