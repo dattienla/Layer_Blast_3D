@@ -66,6 +66,7 @@ MonoBehaviour:
   scoreText: {fileID: 0}
   winGamePanel: {fileID: 0}
   inGamePanel: {fileID: 0}
+  coinText: {fileID: 0}
   settingPanel: {fileID: 0}
   settingBoard: {fileID: 0}
   loseGamePanel: {fileID: 0}
@@ -178,7 +179,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 0.1
   m_Pitch: 1
   Loop: 0

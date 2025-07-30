@@ -246,10 +246,8 @@ public class DraggableBlock : MonoBehaviour
     }
     void Haptic()
     {
-        Debug.Log("dsaaa");
         for (int loop = 0; loop < 5; loop++)
         {
-            Debug.Log("sss");
             float delay = 0.1f * loop;
             StartCoroutine(PlayHapticAfterDelay(delay)); // Delay nhỏ
         }

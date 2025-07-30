@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     // In Game Panel
     [SerializeField]
     private GameObject inGamePanel;
+    [SerializeField]
+    private TextMeshProUGUI coinText;
     // Setting
     [SerializeField]
     private GameObject settingPanel;
@@ -52,6 +54,7 @@ public class GameManager : MonoBehaviour
     void InGamePanel()
     {
         Time.timeScale = 1f;
+        coinText.text = PlayerPrefs.GetInt("Coin", 0).ToString();
         inGamePanel.SetActive(true);
         winGamePanel.SetActive(false);
         loseGamePanel.SetActive(false);
@@ -109,7 +112,11 @@ public class GameManager : MonoBehaviour
         });
         inGamePanel.SetActive(true);
     }
-
+    public void Reset()
+    {
+        string currentSceneName = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(currentSceneName);
+    }
     public void ReturnLevel1()
     {
         SceneManager.LoadScene(0);

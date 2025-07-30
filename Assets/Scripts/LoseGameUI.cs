@@ -1,4 +1,6 @@
-﻿using DG.Tweening;
+﻿using CrazyLabsExtension;
+using DG.Tweening;
+using Lofelt.NiceVibrations;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -97,8 +99,22 @@ public class LoseGameUI : MonoBehaviour
         {
             SpawnAndFlyCoins();
             Invoke("CoinUpdate", 0.8f);
+            Invoke("Haptic", 0.8f);
             isClickAds = true;
         }
+    }
+    void Haptic()
+    {
+        for (int loop = 0; loop < 5; loop++)
+        {
+            float delay = 0.1f * loop;
+            StartCoroutine(PlayHapticAfterDelay(delay)); // Delay nhỏ
+        }
+    }
+    private IEnumerator PlayHapticAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        HapticFeedbackController.TriggerHaptics(HapticPatterns.PresetType.Selection);
     }
     public void Reset()
     {
