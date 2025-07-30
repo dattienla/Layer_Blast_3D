@@ -1,5 +1,8 @@
-﻿using DG.Tweening;
+﻿using CrazyLabsExtension;
+using DG.Tweening;
 using JetBrains.Annotations;
+using Lofelt.NiceVibrations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -7,10 +10,8 @@ using UnityEngine;
 
 public class BlockManager : MonoBehaviour
 {
-    //public int cubeQuantity; // Số lượng cube con trong block
-    // public string[] color; // Màu của block
     public bool isUsed = false; // Trạng thái của block
-                                // public int quantity; // Số lượng lớp trong block
+
 
     private void Awake()
     {
@@ -159,15 +160,15 @@ public class BlockManager : MonoBehaviour
         foreach (var cube in GetCubeOutSite())
         {
             cube.gameObject.SetActive(true);
-            GameManager.Instance.sfxSource.PlayOneShot(GameManager.Instance.explodeAudio);
+            SettingUI.Instance.sfxSource.PlayOneShot(SettingUI.Instance.explodeAudio);
             cube.DOScale(Vector3.one * 0.3f, 0.4f).SetEase(Ease.InBack).OnComplete(() =>
             {
+                cube.rotation = Quaternion.Euler(45, 45, 0);
                 cube.DOMove(new Vector3(cube.transform.position.x, cube.transform.position.y + 2f, cube.transform.position.z), 0.1f).OnComplete(() =>
                 {
                     cube.DOMove(new Vector3(-0.15f, 0f, 7f), 0.5f)
                     .SetEase(Ease.InBack).OnComplete(() =>
                     {
-
                         GameManager.Instance.score++; // Tăng điểm khi phá hủy block
                         GameManager.Instance.CheckWinGame(); // Kiểm tra thắng game
                         Destroy(cube.gameObject);
@@ -190,6 +191,7 @@ public class BlockManager : MonoBehaviour
             }
         }
     }
+
     // Lấy ra toạ độ tương đối của các cube con 
     public List<Vector2Int> GetPositionOfCubes()
     {

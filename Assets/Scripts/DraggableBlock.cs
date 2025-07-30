@@ -1,9 +1,13 @@
-﻿using DG.Tweening;
+﻿using CrazyLabsExtension;
+using DG.Tweening;
+using Lofelt.NiceVibrations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class DraggableBlock : MonoBehaviour
 {
@@ -28,53 +32,54 @@ public class DraggableBlock : MonoBehaviour
 
     void Update()
     {
-        if (FindObjectOfType<DeleteBlock>().isDo == true)
+        if (!EventSystem.current.IsPointerOverGameObject())
         {
-            return; // Nếu đang xử lý nổ block thì không cho kéo
-        }
-        // PC: xử lý bằng chuột trái
-        if (Input.GetMouseButtonDown(0))
-        {
-            TryStartDrag(Input.mousePosition);
-        }
-        else if (Input.GetMouseButton(0))
-        {
-            if (isDragging)
+            if (FindObjectOfType<DeleteBlock>().isDo == true)
             {
-                DragBlock(Input.mousePosition);
+                return; // Nếu đang xử lý nổ block thì không cho kéo
+            }
+            // PC: xử lý bằng chuột trái
+            if (Input.GetMouseButtonDown(0))
+            {
+                TryStartDrag(Input.mousePosition);
+            }
+            else if (Input.GetMouseButton(0))
+            {
+                if (isDragging)
+                {
+                    DragBlock(Input.mousePosition);
+                }
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                if (isDragging)
+                {
+                    EndDrag();
+                }
             }
         }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            if (isDragging)
-            {
-                EndDrag();
-            }
-        }
-
-        // Mobile: xử lý bằng touch
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
-            switch (touch.phase)
+
+            if (!EventSystem.current.IsPointerOverGameObject(touch.fingerId))
             {
-                case TouchPhase.Began:
-                    TryStartDrag(touch.position);
-                    break;
-                case TouchPhase.Moved:
-                case TouchPhase.Stationary:
-                    if (isDragging)
-                    {
-                        DragBlock(touch.position);
-                    }
-                    break;
-                case TouchPhase.Ended:
-                case TouchPhase.Canceled:
-                    if (isDragging)
-                    {
-                        EndDrag();
-                    }
-                    break;
+                switch (touch.phase)
+                {
+                    case TouchPhase.Began:
+                        TryStartDrag(touch.position);
+                        break;
+                    case TouchPhase.Moved:
+                    case TouchPhase.Stationary:
+                        if (isDragging)
+                            DragBlock(touch.position);
+                        break;
+                    case TouchPhase.Ended:
+                    case TouchPhase.Canceled:
+                        if (isDragging)
+                            EndDrag();
+                        break;
+                }
             }
         }
     }
@@ -208,11 +213,13 @@ public class DraggableBlock : MonoBehaviour
         int j = 0;
         while (j < 10)
         {
+
             j++;
             FindObjectOfType<DeleteBlock>().isDo = true;
             Debug.Log("Coroutine Loop: " + j + " | Time: " + Time.time);
             ExpldeBlock();
             if (FindObjectOfType<DeleteBlock>().isExplode == false) break;
+            Invoke("Haptic", 1.05f);
             FindObjectOfType<DeleteBlock>().cnt = 0;
             yield return new WaitForSeconds(1.1f);
         }
@@ -222,6 +229,7 @@ public class DraggableBlock : MonoBehaviour
     }
     void ExpldeBlock()
     {
+
         Queue<BlockManager> temp = new Queue<BlockManager>(BlockQ);
 
         foreach (var dat in temp)
@@ -233,7 +241,23 @@ public class DraggableBlock : MonoBehaviour
         {
             pre.Explode();
         }
+
         FindObjectOfType<DeleteBlock>().PreBlockExplode.Clear();
+    }
+    void Haptic()
+    {
+        Debug.Log("dsaaa");
+        for (int loop = 0; loop < 5; loop++)
+        {
+            Debug.Log("sss");
+            float delay = 0.1f * loop;
+            StartCoroutine(PlayHapticAfterDelay(delay)); // Delay nhỏ
+        }
+    }
+    private IEnumerator PlayHapticAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        HapticFeedbackController.TriggerHaptics(HapticPatterns.PresetType.Selection);
     }
     /// <summary>
     /// Highlight các ô mà block sẽ snap vào

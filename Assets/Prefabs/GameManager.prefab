@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 323410983446001612}
   - component: {fileID: 5426026397806008851}
   - component: {fileID: 5504932594195124496}
+  - component: {fileID: 3434949851551390618}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -64,25 +65,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scoreText: {fileID: 0}
   winGamePanel: {fileID: 0}
-  winGameTitle: {fileID: 0}
   inGamePanel: {fileID: 0}
   settingPanel: {fileID: 0}
-  soundButtonOn: {fileID: 0}
-  soundButtonOff: {fileID: 0}
-  musicButtonOn: {fileID: 0}
-  musicButtonOff: {fileID: 0}
-  vibrateButtonOn: {fileID: 0}
-  vibrateButtonOff: {fileID: 0}
-  privacyButton: {fileID: 0}
-  termsButton: {fileID: 0}
-  restoreButton: {fileID: 0}
   settingBoard: {fileID: 0}
   loseGamePanel: {fileID: 0}
   score: 0
   scoreWin: 60
-  backgroundSource: {fileID: 5426026397806008851}
-  sfxSource: {fileID: 5504932594195124496}
-  explodeAudio: {fileID: 8300000, guid: 4b417adff45c2ad4ab3ca49f6a64cd29, type: 3}
 --- !u!82 &5426026397806008851
 AudioSource:
   m_ObjectHideFlags: 0
@@ -191,7 +179,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.2
+  m_Volume: 0.1
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -275,3 +263,15 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3434949851551390618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1709026149169517272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd7dd1567a018c14a8796cc21f775118, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
