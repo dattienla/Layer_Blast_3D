@@ -28,6 +28,8 @@ public class SettingUI : MonoBehaviour
     public AudioSource backgroundSource;
     public AudioSource sfxSource;
     public AudioClip explodeAudio;
+    public AudioClip winGameAudio;
+    public AudioClip loseGameAudio;
     private void Awake()
     {
         Instance = this;

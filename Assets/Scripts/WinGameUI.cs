@@ -64,34 +64,44 @@ public class WinGameUI : MonoBehaviour
             isClick = false;
         });
     }
+    IEnumerator SpawnCoin(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        // Tạo coin
+        GameObject coin = Instantiate(coinPrefab, CoinCollectImage.transform);
+
+        // Vị trí random trong khu vực
+        RectTransform coinRT = coin.GetComponent<RectTransform>();
+        coinRT.anchoredPosition = new Vector2(
+            Random.Range(-100f, 100f),
+            Random.Range(-50f, 50f)
+        );
+        coinRT.transform.DOMove(new Vector3(50f, -100f, 0) + coinRT.transform.position, 0.3f).OnComplete(() =>
+        {
+            coinRT.transform.DOMove(coinOfPlayerImage.transform.position, 0.5f).OnComplete(() =>
+            {
+                Destroy(coin);
+            });
+        });
+
+        // Di chuyển coin bay lên (Y tăng)
+    }
     public void SpawnAndFlyCoins()
     {
         for (int i = 0; i < 10; i++)
         {
-            // Tạo coin
-            GameObject coin = Instantiate(coinPrefab, CoinCollectImage.transform);
-
-            // Vị trí random trong khu vực
-            RectTransform coinRT = coin.GetComponent<RectTransform>();
-            coinRT.anchoredPosition = new Vector2(
-                Random.Range(-100f, 100f),
-                Random.Range(-50f, 50f)
-            );
-
-            // Di chuyển coin bay lên (Y tăng)
-            coinRT.transform.DOMove(new Vector3(50f, -100f, 0) + coinRT.transform.position, 0.3f).OnComplete(() =>
-            {
-                coinRT.transform.DOMove(coinOfPlayerImage.transform.position, 0.5f).OnComplete(() =>
-                {
-                    Destroy(coin);
-                });
-            });
+            float delay = 0.05f * i;
+            StartCoroutine(SpawnCoin(delay));
         }
     }
     void NextLevelDelay()
     {
         int sceneIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(sceneIndex + 1);
+        if (sceneIndex == 5)
+        {
+            SceneManager.LoadScene(0);
+        }
+        else SceneManager.LoadScene(sceneIndex + 1);
     }
     public void CoinUpdate()
     {
@@ -105,9 +115,9 @@ public class WinGameUI : MonoBehaviour
         if (isClick == false)
         {
             SpawnAndFlyCoins();
-            Invoke("NextLevelDelay", 1.2f);
-            Invoke("CoinUpdate", 0.8f);
-            Invoke("Haptic", 0.8f);
+            Invoke("NextLevelDelay", 1.6f);
+            Invoke("CoinUpdate", 1.3f);
+            Invoke("Haptic", 0.9f);
             isClick = true;
         }
     }

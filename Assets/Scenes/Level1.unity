@@ -3816,7 +3816,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03399ba544f68bf459b2efcf956c3bea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  level1: {fileID: 1505412137}
 --- !u!4 &1505412139
 Transform:
   m_ObjectHideFlags: 0
@@ -4594,6 +4593,8 @@ MonoBehaviour:
   backgroundSource: {fileID: 2094046936}
   sfxSource: {fileID: 2094046935}
   explodeAudio: {fileID: 8300000, guid: 4b417adff45c2ad4ab3ca49f6a64cd29, type: 3}
+  winGameAudio: {fileID: 8300000, guid: 8db8ec62317e7db4a943fc7231cd5cdd, type: 3}
+  loseGameAudio: {fileID: 8300000, guid: 4ea3e9449bc13cb43be2463f2633d329, type: 3}
 --- !u!4 &2094046934
 Transform:
   m_ObjectHideFlags: 0

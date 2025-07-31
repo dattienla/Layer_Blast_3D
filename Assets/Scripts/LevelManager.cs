@@ -8,8 +8,7 @@ using UnityEngine.XR;
 
 public class LevelManager : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject level1;
+
     Vector2Int head = new Vector2Int(1, 1); // vector của GridManager
     List<GameObject> allBlockOutPref = new List<GameObject>();
     List<GameObject> allBlockInPref = new List<GameObject>();
@@ -23,11 +22,11 @@ public class LevelManager : MonoBehaviour
     void Level()
     {
         List<GridCell> targetCells = new List<GridCell>();
-        for (int i = 0; i < level1.transform.childCount; i++)
+        for (int i = 0; i < transform.childCount; i++)
         {
-            for (int j = 0; j < level1.transform.GetChild(i).transform.childCount; j++)
+            for (int j = 0; j < transform.GetChild(i).transform.childCount; j++)
             {
-                GameObject obj = level1.transform.GetChild(i).GetChild(j).gameObject;
+                GameObject obj = transform.GetChild(i).GetChild(j).gameObject;
                 if (obj.tag == "cubeMatOut" || obj.tag == "cubeMatIn")
                 {
                     allBlockMat.Add(obj);

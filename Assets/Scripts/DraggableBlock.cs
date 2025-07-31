@@ -32,57 +32,44 @@ public class DraggableBlock : MonoBehaviour
 
     void Update()
     {
+        if (FindObjectOfType<DeleteBlock>().isDo)
+            return;
+
+#if UNITY_EDITOR || UNITY_STANDALONE
+        // PC: xử lý chuột
         if (!EventSystem.current.IsPointerOverGameObject())
         {
-            if (FindObjectOfType<DeleteBlock>().isDo == true)
-            {
-                return; // Nếu đang xử lý nổ block thì không cho kéo
-            }
-            // PC: xử lý bằng chuột trái
-            if (Input.GetMouseButtonDown(0))
-            {
-                TryStartDrag(Input.mousePosition);
-            }
-            else if (Input.GetMouseButton(0))
-            {
-                if (isDragging)
-                {
-                    DragBlock(Input.mousePosition);
-                }
-            }
-            else if (Input.GetMouseButtonUp(0))
-            {
-                if (isDragging)
-                {
-                    EndDrag();
-                }
-            }
+            if (Input.GetMouseButtonDown(0)) TryStartDrag(Input.mousePosition);
+            else if (Input.GetMouseButton(0) && isDragging) DragBlock(Input.mousePosition);
+            else if (Input.GetMouseButtonUp(0) && isDragging) EndDrag();
         }
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
+#elif UNITY_ANDROID || UNITY_IOS
+    // Mobile: xử lý touch
+    if (Input.touchCount > 0)
+    {
+        Touch touch = Input.GetTouch(0);
 
-            if (!EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+        if (!EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+        {
+            switch (touch.phase)
             {
-                switch (touch.phase)
-                {
-                    case TouchPhase.Began:
-                        TryStartDrag(touch.position);
-                        break;
-                    case TouchPhase.Moved:
-                    case TouchPhase.Stationary:
-                        if (isDragging)
-                            DragBlock(touch.position);
-                        break;
-                    case TouchPhase.Ended:
-                    case TouchPhase.Canceled:
-                        if (isDragging)
-                            EndDrag();
-                        break;
-                }
+                case TouchPhase.Began:
+                    TryStartDrag(touch.position);
+                    break;
+                case TouchPhase.Moved:
+                case TouchPhase.Stationary:
+                    if (isDragging) DragBlock(touch.position);
+                    break;
+                case TouchPhase.Ended:
+                case TouchPhase.Canceled:
+                    if (isDragging) EndDrag();
+                    break;
             }
         }
     }
+#endif
+    }
+
 
     void TryStartDrag(Vector3 inputPos)
     {

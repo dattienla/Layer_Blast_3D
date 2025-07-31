@@ -66,16 +66,16 @@ public class GameManager : MonoBehaviour
     void WinGamePanel()
     {
         WinGameUI.instance.WinGamePanel();
+        SettingUI.Instance.sfxSource.PlayOneShot(SettingUI.Instance.winGameAudio);
         inGamePanel.SetActive(false);
         winGamePanel.SetActive(true);
         loseGamePanel.SetActive(false);
-
     }
     public void CheckWinGame()
     {
         if (score >= scoreWin)
         {
-            Invoke("CheckWinGameDelay", 0.5f);
+            Invoke("CheckWinGameDelay", 0f);
         }
     }
     void CheckWinGameDelay()
@@ -116,9 +116,5 @@ public class GameManager : MonoBehaviour
     {
         string currentSceneName = SceneManager.GetActiveScene().name;
         SceneManager.LoadScene(currentSceneName);
-    }
-    public void ReturnLevel1()
-    {
-        SceneManager.LoadScene(0);
     }
 }

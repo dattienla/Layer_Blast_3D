@@ -40,6 +40,7 @@ public class LoseGameUI : MonoBehaviour
 
     public void LoseGamePanel()
     {
+        SettingUI.Instance.sfxSource.PlayOneShot(SettingUI.Instance.loseGameAudio);
         int levelIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex + 1;
         levelFailText.GetComponent<TextMeshProUGUI>().text = "Level " + levelIndex.ToString() + " Failed";
         levelFailText.transform.localScale = Vector3.zero;
@@ -62,28 +63,34 @@ public class LoseGameUI : MonoBehaviour
 
 
     }
-    public void SpawnAndFlyCoins()
+    IEnumerator SpawnCoins(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        // Tạo coin
+        GameObject coin = Instantiate(coinPrefab, adsButton.transform);
+
+        // Vị trí random trong khu vực
+        RectTransform coinRT = coin.GetComponent<RectTransform>();
+        coinRT.anchoredPosition = new Vector2(
+            Random.Range(-100f, 100f),
+            Random.Range(-50f, 50f)
+        );
+
+        // Di chuyển coin bay lên (Y tăng)
+        coinRT.transform.DOMove(new Vector3(50f, -100f, 0) + coinRT.transform.position, 0.3f).OnComplete(() =>
+        {
+            coinRT.transform.DOMove(coinOfPlayerImage.transform.position, 0.5f).OnComplete(() =>
+            {
+                Destroy(coin);
+            });
+        });
+    }
+    void SpawnAndFlyCoins()
     {
         for (int i = 0; i < 10; i++)
         {
-            // Tạo coin
-            GameObject coin = Instantiate(coinPrefab, adsButton.transform);
-
-            // Vị trí random trong khu vực
-            RectTransform coinRT = coin.GetComponent<RectTransform>();
-            coinRT.anchoredPosition = new Vector2(
-                Random.Range(-100f, 100f),
-                Random.Range(-50f, 50f)
-            );
-
-            // Di chuyển coin bay lên (Y tăng)
-            coinRT.transform.DOMove(new Vector3(50f, -100f, 0) + coinRT.transform.position, 0.3f).OnComplete(() =>
-            {
-                coinRT.transform.DOMove(coinOfPlayerImage.transform.position, 0.5f).OnComplete(() =>
-                {
-                    Destroy(coin);
-                });
-            });
+            float delay = i * 0.05f;
+            StartCoroutine(SpawnCoins(delay));
         }
     }
     public void CoinUpdate()
@@ -98,7 +105,7 @@ public class LoseGameUI : MonoBehaviour
         if (isClickAds == false)
         {
             SpawnAndFlyCoins();
-            Invoke("CoinUpdate", 0.8f);
+            Invoke("CoinUpdate", 1.3f);
             Invoke("Haptic", 0.8f);
             isClickAds = true;
         }
