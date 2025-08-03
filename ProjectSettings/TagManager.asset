@@ -10,6 +10,8 @@ TagManager:
   - cubeMat
   - cubeMatOut
   - cubeMatIn
+  - cubeIn
+  - cubeOut
   layers:
   - Default
   - TransparentFX

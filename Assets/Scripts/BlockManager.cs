@@ -19,8 +19,34 @@ public class BlockManager : MonoBehaviour
     }
     void Start()
     {
+        List<GameObject> objWithParent = new List<GameObject>();
+        foreach (Transform op in GetCubeOutSite())
+        {
+            if (op.transform.parent == GetCubeMatOutSite().transform.parent)
+            {
+                objWithParent.Add(op.gameObject);
+            }
+        }
+        Vector3 cubeCenter = Vector3.zero;
+        foreach (var cube in objWithParent)
+            cubeCenter += cube.transform.localPosition;
+
+        cubeCenter /= objWithParent.Count;
+        // Tính offset giữa pivot và mesh center trong local space
+        MeshFilter mf = GetCubeMatOutSite().GetComponent<MeshFilter>();
+        Vector3 meshCenterLocal = mf.sharedMesh.bounds.center;
+        Vector3 offset = GetCubeMatOutSite().transform.localRotation * meshCenterLocal;
+        Vector3 newLocalPos = cubeCenter + offset * -1f;
+        int X = Mathf.RoundToInt(newLocalPos.x);
+        int Z = Mathf.RoundToInt(newLocalPos.z);
+        int Y = Mathf.RoundToInt(newLocalPos.y);
+        GetCubeMatOutSite().transform.localPosition = new Vector3(X, Y, Z);
+        GetCubeMatOutSite().transform.localScale = new Vector3(1.4f, 1.4f, 1.4f);
+        GetCubeMatOutSite().gameObject.SetActive(true); // Hiển thị cubeMatOutSite
+
         if (GetCubeMatInSite() != null)
         {
+            GetCubeMatInSite().transform.localPosition = new Vector3(X, Y, Z);
             GetCubeMatInSite().transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             GetCubeMatInSite().gameObject.SetActive(true);
         }
@@ -28,8 +54,6 @@ public class BlockManager : MonoBehaviour
         {
             cube.gameObject.SetActive(false); // Ẩn tất cả cube con khi khởi tạo block
         }
-        GetCubeMatOutSite().transform.localScale = new Vector3(1.4f, 1.4f, 1.4f);
-        GetCubeMatOutSite().gameObject.SetActive(true); // Hiển thị cubeMatOutSite
     }
     //Trả về tất cả cube con
     public List<Transform> GetCubes()
@@ -54,8 +78,7 @@ public class BlockManager : MonoBehaviour
         {
             if (child.tag != "cubeMatOut" && child.tag != "cubeMatIn")
             {
-                CubeManager cubeManager = child.GetComponent<CubeManager>();
-                if (cubeManager.status == "cubeOut")
+                if (child.tag == "cubeOut")
                     cubes.Add(child);
             }
 
@@ -70,8 +93,7 @@ public class BlockManager : MonoBehaviour
         {
             if (child.tag != "cubeMatOut" && child.tag != "cubeMatIn")
             {
-                CubeManager cubeManager = child.GetComponent<CubeManager>();
-                if (cubeManager.status == "cubeIn")
+                if (child.tag == "cubeIn")
                     cubes.Add(child);
             }
         }
@@ -170,7 +192,8 @@ public class BlockManager : MonoBehaviour
                     .SetEase(Ease.InBack).OnComplete(() =>
                     {
                         GameManager.Instance.score++; // Tăng điểm khi phá hủy block
-                        GameManager.Instance.CheckWinGame(); // Kiểm tra thắng game
+                        if (GameManager.Instance.isWin == false)
+                            GameManager.Instance.CheckWinGame(); // Kiểm tra thắng game
                         Destroy(cube.gameObject);
                         // Debug.Log(GetCubes().Count);
                     });
@@ -179,8 +202,7 @@ public class BlockManager : MonoBehaviour
         }
         foreach (var cube in GetCubeInSite())
         {
-            CubeManager cubeManager = cube.GetComponent<CubeManager>();
-            cubeManager.status = "cubeOut"; // cho cube trong thành cube ngoài 
+            cube.tag = "cubeOut"; // cho cube trong thành cube ngoài 
             cube.DOScale(new Vector3(1f, 1f, 1f), 0.4f).SetEase(Ease.InBack);
         }
         foreach (var cell in GetOccupiedCells())

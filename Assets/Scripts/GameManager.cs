@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     // Win Game Panel
     [SerializeField]
     private GameObject winGamePanel;
+    public bool isWin;
     // In Game Panel
     [SerializeField]
     private GameObject inGamePanel;
@@ -75,13 +76,11 @@ public class GameManager : MonoBehaviour
     {
         if (score >= scoreWin)
         {
-            Invoke("CheckWinGameDelay", 0f);
+            isWin = true;
+            WinGamePanel();
         }
     }
-    void CheckWinGameDelay()
-    {
-        WinGamePanel();
-    }
+
 
     // Lose Game
     public void LoseGamePanel()

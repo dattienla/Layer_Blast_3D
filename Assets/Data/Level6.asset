@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37db93962dae477479f8ef3140f7aa02, type: 3}
+  m_Name: Level6
+  m_EditorClassIdentifier: 
+  blocks:
+  - blockMeshType: 05000000
+    blockMaterialType: 04000000
+    rotation: {x: -90, y: 0, z: 0}
+    posInGrid:
+    - {x: 1, y: 1}
+    - {x: 1, y: 2}
+    - {x: 2, y: 1}
+  - blockMeshType: 05000000
+    blockMaterialType: 04000000
+    rotation: {x: -90, y: 90, z: 0}
+    posInGrid:
+    - {x: 1, y: 5}
+    - {x: 1, y: 6}
+    - {x: 2, y: 6}
+  - blockMeshType: 05000000
+    blockMaterialType: 04000000
+    rotation: {x: -90, y: -90, z: 0}
+    posInGrid:
+    - {x: 4, y: 1}
+    - {x: 5, y: 1}
+    - {x: 5, y: 2}
+  - blockMeshType: 05000000
+    blockMaterialType: 04000000
+    rotation: {x: -90, y: 180, z: 0}
+    posInGrid:
+    - {x: 4, y: 6}
+    - {x: 5, y: 5}
+    - {x: 5, y: 6}
+  - blockMeshType: 010000000a000000
+    blockMaterialType: 0200000000000000
+    rotation: {x: -90, y: -90, z: 0}
+    posInGrid:
+    - {x: 2, y: 2}
+    - {x: 3, y: 2}
+    - {x: 3, y: 1}
+    - {x: 4, y: 2}
+  - blockMeshType: 090000000a000000
+    blockMaterialType: 0000000002000000
+    rotation: {x: -90, y: 90, z: 0}
+    posInGrid:
+    - {x: 2, y: 5}
+    - {x: 3, y: 5}
+    - {x: 3, y: 6}
+    - {x: 4, y: 5}
+  blocksOfPlayer_1:
+  - blockMeshType: 0100000002000000
+    blockMaterialType: 0000000002000000
+    rotation: {x: -90, y: 0, z: 0}
+    posOfCubes:
+    - {x: 0, y: 0}
+    - {x: 1, y: 0}
+  blocksOfPlayer_2: []
+  blocksOfPlayer_3: []

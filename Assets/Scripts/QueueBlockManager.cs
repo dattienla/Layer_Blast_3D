@@ -13,8 +13,7 @@ public class QueueBlockManager : MonoBehaviour
     private Vector3 slot1 = new Vector3(-2.5f, 0, -4);
     private Vector3 slot2 = new Vector3(0, 0, -4);
     private Vector3 slot3 = new Vector3(2, 0, -4);
-    [SerializeField]
-    private GameObject[] blockOfPlayer;
+    public GameObject[] blockOfPlayer;
     private void Awake()
     {
         Instance = this;

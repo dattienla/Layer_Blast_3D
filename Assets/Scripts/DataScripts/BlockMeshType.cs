@@ -1,0 +1,25 @@
+public enum BlockMeshType
+{
+    Cube1,
+    Cube2In,
+    Cube2Out,
+    Cube3In,
+    Cube3Out,
+    Cube4In,
+    Cube4Out,
+    Cube5In,
+    Cube5Out,
+    Cube6In,
+    Cube6Out,
+    Cube7In,
+    Cube7Out,
+    Cube8In,
+    Cube8Out,
+    Cube9In,
+    Cube9Out,
+    Cube10In,
+    Cube10Out,
+    Cube11In,
+    Cube11Out,
+    None
+}

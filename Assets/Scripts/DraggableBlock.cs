@@ -212,7 +212,8 @@ public class DraggableBlock : MonoBehaviour
         }
         FindObjectOfType<DeleteBlock>().isDo = false;
         Debug.Log("Coroutine kết thúc");
-        Invoke(nameof(CheckEndGameDelay), (j - 1f) * 1.3f + 0.3f);
+        if (GameManager.Instance.isWin == false)
+            Invoke(nameof(CheckEndGameDelay), (j - 1f) * 1.3f + 0.3f);
     }
     void ExpldeBlock()
     {

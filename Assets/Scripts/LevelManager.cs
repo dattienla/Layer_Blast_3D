@@ -21,7 +21,6 @@ public class LevelManager : MonoBehaviour
     }
     void Level()
     {
-        List<GridCell> targetCells = new List<GridCell>();
         for (int i = 0; i < transform.childCount; i++)
         {
             for (int j = 0; j < transform.GetChild(i).transform.childCount; j++)
@@ -32,8 +31,8 @@ public class LevelManager : MonoBehaviour
                     allBlockMat.Add(obj);
                     continue;
                 }
-                if (obj.GetComponent<CubeManager>().status == "cubeOut") allBlockOutPref.Add(obj);
-                else if (obj.GetComponent<CubeManager>().status == "cubeIn") allBlockInPref.Add(obj);
+                if (obj.tag == "cubeOut") allBlockOutPref.Add(obj);
+                else if (obj.tag == "cubeIn") allBlockInPref.Add(obj);
             }
         }
         foreach (GameObject obj in allBlockOutPref)
